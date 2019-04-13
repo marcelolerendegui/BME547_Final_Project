@@ -1,55 +1,32 @@
-Standard:
-    PEP8
-    Travis CI
-    Sphinx docstrings
-    Type Hints
-    Docstrings on every function/class
-    Reviewers for each pull request
+Image Formats
+----------------
 
-    "ID/BLOCK_SUBBLOCK_feature"
-    e.g:
-        if Marcelo Lerendegui is working adding a filter to the image processing core of the server: 
-            git checkout -b "ml/SERVER_IMC_add_filter"
+The server will handle the following image formats:
+    - PNG
+    - JPEG
+    - TIFF
 
-TODO:
-Doc
-    README                      (Marcelo)
-    Sphinx doc                  (Marcelo)
+Standards
+------------
 
-Setup Travis-CI                 (Marcelo)
+**Documentation Standards**:
 
-Project Structure               (Marcelo)
+    - rST files
+    - Sphinx Documentation
+    - Mermaid for diagrams
 
-Client
-    GUI                         (Willy)
-        Design                  (Willy, Yihang, Marcelo)
-        Draw                    (Willy)
-        Assign Callbacks        (Willy)
+**Code Standards**:
 
-    Api Calls
-        Define Protocol         (Willy, Yihang, Marcelo)
+    - PEP8
+    - Type Hints
+    - Docstrings on every function/class
+    - Sphinx docstrings
 
-    Integration Tests           (Willy, Yihang, Marcelo)
+**Repository Sandards**:
 
-Server
-    Database                    (Yihang)
-        Online MongoDB Setup    (Yihang)
-        Design                  (Willy, Yihang, Marcelo)
-        Implement Model         (Yihang)
-        Implement calls         (Yihang)
-        Unit Tests              (Yihang)
+    - Travis CI
+    - Reviewers for each pull request
+    - Branch naming style: "UID/BLOCK_SUBBLOCK_action_feature"
+    - Issues for things to add and fix
 
-    Views                       (Marcelo)
-        Define Protocol         (Willy, Yihang, Marcelo)
-    
-    Image Processing Core
-        Implement               (Marcelo)
-        Unit Tests              (Marcelo)
-    Api                         (Marcelo)
-        Implement               (Marcelo)
-        Unit Tests              (Marcelo)
-    Validation                  (Marcelo)
-        Implement               (Marcelo)
-        Unit Tests              (Marcelo)
 
-    Integration Tests           (Willy, Yihang, Marcelo)
