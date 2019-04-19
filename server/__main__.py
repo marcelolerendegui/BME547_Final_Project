@@ -18,3 +18,8 @@
 # You should have received a copy of the GNU General Public License
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
+
+from server import app
+
+app.run(host='0.0.0.0')
+# app.run(debug=True)
