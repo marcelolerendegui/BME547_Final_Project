@@ -18,3 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
+
+from pymodm import connect, MongoModel, fields
+
+
+class Image(MongoModel):
+    image_id = fields.CharField(verbose_name="id")

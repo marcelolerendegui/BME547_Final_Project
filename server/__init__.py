@@ -18,3 +18,11 @@
 # You should have received a copy of the GNU General Public License
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
+
+from flask import Flask
+
+app = Flask(__name__)
+
+# This import after code is necesary because views requires app!
+# Disabled pep8 E402 verification using NOQA
+import server.views  # NOQA

@@ -18,3 +18,39 @@
 # You should have received a copy of the GNU General Public License
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
+
+
+def get_image_size():
+    pass
+
+
+def transform_image():
+    pass
+
+
+def histogram_equalization():
+    pass
+
+
+def contrast_stretch():
+    pass
+
+
+def log_compression():
+    pass
+
+
+def contrast_invert():
+    pass
+
+
+def format_convert():
+    pass
+
+
+def fstream_to_sbase64():
+    pass
+
+
+def sbase64_to_fstream():
+    pass

@@ -18,3 +18,42 @@
 # You should have received a copy of the GNU General Public License
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
+
+from server import app
+from flask import request, jsonify
+import server.api as api
+
+
+@app.route("/", methods=["GET"])
+def server_on():
+    pass
+
+
+@app.route("/api/upload/image", methods=["POST"])
+def on_POST_upload_image():
+    pass
+
+
+@app.route("/api/upload/zip", methods=["POST"])
+def on_POST_upload_zip():
+    pass
+
+
+@app.route('/api/image_info/all', methods=["GET"])
+def on_GET_images_info():
+    pass
+
+
+@app.route('/api/download/', methods=["GET"])
+def on_GET_download():
+    pass
+
+
+@app.route('/api/image_process', methods=["POST"])
+def on_POST_image_process():
+    pass
+
+
+@app.route("/api/log", methods=["GET"])
+def on_GET_log():
+    pass
