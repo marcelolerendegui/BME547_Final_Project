@@ -31,6 +31,7 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QDialog
 
 from client.GUIImageTable import GUIImageTable
+from client.GUIShowImage import ImageDisplayer
 
 
 class GUIMain(QMainWindow):
@@ -41,6 +42,8 @@ class GUIMain(QMainWindow):
         self.resize(988, 505)
         self.centralWidget = QWidget(self)
         self.setGeometry(100, 100, 650, 500)
+
+        self.img_displayer = ImageDisplayer()
 
         # Table
         self.tbl_images = GUIImageTable(self.centralWidget)
@@ -102,7 +105,9 @@ class GUIMain(QMainWindow):
         self.btn_dload_tiff.setText("Download TIFF")
         self.btn_dload_png.setText("Download PNG")
         self.btn_upload.setText("Upload")
+
         self.btn_upload.clicked.connect(self.upload_callback)
+        self.btn_display.clicked.connect(self.btn_display_callback)
 
     def upload_callback(self):
 
@@ -137,3 +142,10 @@ class GUIMain(QMainWindow):
         indexes = self.tbl_images.selectionModel().selectedRows()
         for index in sorted(indexes):
             print('Row %d is selected' % index.row())
+
+    def btn_display_callback(self):
+        self.img_displayer.new_display()
+
+    def btn_compare_callback(self):
+
+        pass
