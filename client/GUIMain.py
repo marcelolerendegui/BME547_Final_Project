@@ -147,5 +147,28 @@ class GUIMain(QMainWindow):
         self.img_displayer.new_display()
 
     def btn_compare_callback(self):
+        # ensure selected row
+        # get image IDs
+        # request for image data
+        # display selected img
+        pass
 
+    def btn_contrast_invert_callback(self):
+        # get requests comtrast_invert func
+        # display comtrast_invert img
+        pass
+
+    def btn_display_hist(self):
+        # get requests img histogram
+        # display img_hist
+        pass
+
+    def btn_display_color_hist(self):
+        # get requests color_histogram image
+        # display color histogra image
+        pass
+
+    def btn_equalize_hist(self):
+        # get requests equalize hist image
+        #
         pass
