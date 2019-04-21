@@ -18,3 +18,35 @@
 # You should have received a copy of the GNU General Public License
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
+
+
+def check_user_password():
+    pass
+
+
+def upload_images():
+    pass
+
+
+def equalize_histogram():
+    pass
+
+
+def contrast_stretch():
+    pass
+
+
+def log_compress():
+    pass
+
+
+def convert():
+    pass
+
+
+def contrast_invert():
+    pass
+
+
+def download_images():
+    pass
