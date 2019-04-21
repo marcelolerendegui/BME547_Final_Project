@@ -170,5 +170,5 @@ class GUIMain(QMainWindow):
 
     def btn_equalize_hist(self):
         # get requests equalize hist image
-        #
+        # display eq
         pass
