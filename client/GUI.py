@@ -19,9 +19,16 @@
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
 
-from client import app
-from client.GUI import GUI
+from client.GUIMain import GUIMain
+from client.GUILoginDialog import GUILoginDialog
 
-gui = GUI()
 
-app.exec_()
+class GUI():
+    def __init__(self):
+        self.dlg_login = GUILoginDialog()
+        self.dlg_login.login.connect(self.callback)
+        self.dlg_login.show()
+        self.client_gui = GUIMain()
+
+    def callback(self):
+        self.client_gui.show()

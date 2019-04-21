@@ -31,15 +31,17 @@ from PyQt5.QtWidgets import QPushButton
 
 
 class GUILoginDialog(QMainWindow):
+    login = QtCore.pyqtSignal()
 
     def __init__(self):
-
         # Main Window
         super().__init__()
+        QtCore.QObject.__init__(self)
         self.resize(988, 505)
         self.centralWidget = QWidget(self)
         self.setGeometry(500, 500, 300, 100)
-
+        self.setFixedSize(300, 100)
+        self.setWindowTitle("Log In")
         # Username Label
         self.lbl_username = QLabel()
         self.lbl_username.setText("Username:")
@@ -82,6 +84,9 @@ class GUILoginDialog(QMainWindow):
         self.setWindowModality(QtCore.Qt.ApplicationModal)
 
     def submit_username_password(self):
+        self.login.emit()
         print(self.txt_username.text())
         print(self.txt_password.text())
+        print("login signal emitted")
+        self.close()
         pass

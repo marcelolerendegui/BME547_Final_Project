@@ -31,7 +31,6 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QDialog
 
 from client.GUIImageTable import GUIImageTable
-from client.GUILoginDialog import GUILoginDialog
 
 
 class GUIMain(QMainWindow):
@@ -56,9 +55,6 @@ class GUIMain(QMainWindow):
         self.verticalLayout.addWidget(self.tbl_images)
         self.verticalLayout.addLayout(self.lay_button_block)
         self.setCentralWidget(self.centralWidget)
-
-        self.dlg_login = GUILoginDialog()
-        self.dlg_login.show()
 
     def create_button_block(self):
         self.btn_compare = QPushButton(self.centralWidget)
