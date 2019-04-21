@@ -31,6 +31,9 @@ MongoDB Model Image
    * - Description
      - User description of the image.
      - string
+   * - User Hash
+     - A hash that identifies a unique user who is the owner of the image
+     - string
    * - Data
      - Actual information in the file containing ALL bytes (including image format metadata)
      - string coded in base64

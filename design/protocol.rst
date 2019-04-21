@@ -17,12 +17,12 @@ To upload a single image, the user must generate a POST request to *server:port/
      - String with the name of the file
    * - 'format'
      - String with the format of the file: PNG, JPEG or TIFF
-   * - 'description'
-     - String with any user description of the image
+   * - 'user_hash'
+     - A String with the user hash
    * - 'data'
      - The WHOLE file converted to a 64base string.
 
-The return value is a tuple with the status and string:
+The return value is a dictionary with following information:
 
 .. list-table:: Upload Image Return Value
    :widths: 10 40
@@ -48,17 +48,15 @@ To upload multiple images, the user must generate a POST request to *server:port
    * - Key
      - Description
    * - 'filename'
-     - List of strings with the name of the files
-   * - 'format'
-     - List of strings with the format of the files: PNG, JPEG or TIFF
-   * - 'description'
-     - List of strings with any user description of the images
+     - String with the name of the zip file
+   * - 'user_hash'
+     - A String with the user hash
    * - 'data'
      - The WHOLE zip file converted to a 64base string.
 
-The return value is a tuple with the status and string:
+The return value is a dictionary with the following information
 
-.. list-table:: Upload Image Return Value
+.. list-table:: Upload Multiple Images Return Value
    :widths: 10 40
    :header-rows: 1
 
@@ -72,7 +70,7 @@ The return value is a tuple with the status and string:
 
 Get Images Info
 ---------------
-To get information about all the images stored in the server, the user must generate a GET request to *server:port/api/image_info/all*.
+To get information about all the images stored in the server, the user must generate a GET request to *server:port/api/image_info/<User Hash>*.
 
 The return value is a dictionary with a key for each image in the server. That key is the Image ID, and each value is a dictionary with the following information:
 
@@ -97,7 +95,7 @@ The return value is a dictionary with a key for each image in the server. That k
 Download Image
 ----------------
 
-To Download a single image, the user must generate a GET request to *server:port/api/download/* with a dictionary with a key (image ID) for each image to download, each value must be dictionary with the following info:
+To Download a single image, the user must generate a GET request to *server:port/api/download/* with a list of dictionaries with the following info:
 
 .. list-table:: Download Images Dictionary
    :widths: 20 40
@@ -105,18 +103,33 @@ To Download a single image, the user must generate a GET request to *server:port
 
    * - Key
      - Description
+   * - 'image_id'
+     - Image ID of the image to download
    * - 'format'
      - Image format to download
+   * - 'user_hash'
+     - A String with the user hash
 
 If only one image ID is provided, the return value will be a string with the image coded in base64
 If many image IDs are provided, the return value will be a string with a zip file with the images coded in base64
+
+.. list-table:: Downlaod Image Return Value
+   :widths: 10 40
+   :header-rows: 1
+   * - Key
+     - Description
+   * - 'sucess'
+     - True / False
+   * - 'error_msg'
+     - String with the error message
+   * - 'data'
+     -  The WHOLE file converted to a 64base string.
 
 
 Image Processing
 ------------------------
 
-
-To apply any processing algorithm to an image, the user must generate a POST request to *server:port/api/hist_eq/* with a dictionary with a key (image ID) for each image to process. Each value must have the following info:
+To apply any processing algorithm to an image, the user must generate a POST request to *server:port/api/img_proc/* with a dictionary with a key (image ID) for each image to process. Each value must have the following info:
 
 .. list-table:: Process Image Input
    :widths: 20 40
