@@ -95,7 +95,7 @@ The return value is a dictionary with a key for each image in the server. That k
 Download Image
 ----------------
 
-To Download a single image, the user must generate a GET request to *server:port/api/download/* with a list of dictionaries with the following info:
+To Download a single image, the user must generate a GET request to *server:port/api/download/* with a dictionary with the following info:
 
 .. list-table:: Download Images Dictionary
    :widths: 20 40
@@ -103,8 +103,8 @@ To Download a single image, the user must generate a GET request to *server:port
 
    * - Key
      - Description
-   * - 'image_id'
-     - Image ID of the image to download
+   * - 'image_ids'
+     - List of Image IDs of the images to download
    * - 'format'
      - Image format to download
    * - 'user_hash'
@@ -116,6 +116,7 @@ If many image IDs are provided, the return value will be a string with a zip fil
 .. list-table:: Downlaod Image Return Value
    :widths: 10 40
    :header-rows: 1
+
    * - Key
      - Description
    * - 'sucess'
@@ -129,7 +130,7 @@ If many image IDs are provided, the return value will be a string with a zip fil
 Image Processing
 ------------------------
 
-To apply any processing algorithm to an image, the user must generate a POST request to *server:port/api/img_proc/* with a dictionary with a key (image ID) for each image to process. Each value must have the following info:
+To apply any processing algorithm to an image, the user must generate a POST request to *server:port/api/img_proc/* with a dictionary the following info:
 
 .. list-table:: Process Image Input
    :widths: 20 40
@@ -137,6 +138,8 @@ To apply any processing algorithm to an image, the user must generate a POST req
 
    * - Key
      - Description
+   * - 'image_id'
+     - Image IDs of the images to process
    * - 'algorithm'
      - Algorithm to apply to the image
    * - 'out_image_format'
@@ -152,8 +155,7 @@ The algorithm can be any of the following:
    * - Contrast Stretching
    * - Log Compression
    * - Contrast Invert
-   * - Just Convert
-   * - Rename
+   * - No Algorithm
 
 The return value is a list with a dictionary with a key (image ID) for each image the user sent to proces. Each element has the following info:
 
@@ -167,5 +169,5 @@ The return value is a list with a dictionary with a key (image ID) for each imag
      - True / False
    * - 'error_msg'
      - String with the error message
-   * - 'image_id'
-     - Image ID of the output processed image
+   * - 'processing_time'
+     - Time it took to process the image

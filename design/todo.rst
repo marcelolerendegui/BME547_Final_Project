@@ -14,7 +14,7 @@ TODOs
      - Add folder structure
      - Setup
      - Marcelo
-     - 
+     - Done
    * - Doc
      - Create README file
      - Setup, Implement
@@ -34,7 +34,7 @@ TODOs
      - Define Protocol
      - Design
      - Willy, Yihang, Marcelo  
-     - 
+     - Done
    * - General
      - User guide video
      - Implement
@@ -44,12 +44,12 @@ TODOs
      - Design GUI
      - Design
      - Willy, Yihang, Marcelo
-     - 
+     - Done
    * - Client_GUI
      - Draw GUI
      - Implement
      - Willy
-     - 
+     - Done
    * - Client_GUI
      - Code GUI
      - Implement
@@ -74,7 +74,7 @@ TODOs
      - DB Design
      - Design
      - Willy, Yihang, Marcelo
-     - 
+     - Done
    * - Server_DB
      - Implement Model
      - Implement
