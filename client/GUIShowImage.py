@@ -78,7 +78,7 @@ class GUIShowImage(QMainWindow):
         self.lbl_image = QLabel(self)
         self.lbl_image.setText("asfafs")
         self.lbl_image.show()
-        self.pixmap = QPixmap('client/image.jpg')
+        self.pixmap = QPixmap('image.jpeg')
         self.lbl_image.setPixmap(self.pixmap)
 
         self.verticalLayout = QVBoxLayout(self.centralWidget)

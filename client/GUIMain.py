@@ -32,6 +32,15 @@ from PyQt5.QtWidgets import QDialog
 
 from client.GUIImageTable import GUIImageTable
 from client.GUIShowImage import ImageDisplayer
+#
+# def test(a,b,c):
+#     """
+#     :param a: 
+#     :param b:
+#     :param c:
+#     :return:
+#     """
+#     pass
 
 
 class GUIMain(QMainWindow):
@@ -108,6 +117,19 @@ class GUIMain(QMainWindow):
 
         self.btn_upload.clicked.connect(self.upload_callback)
         self.btn_display.clicked.connect(self.btn_display_callback)
+        self.btn_contrast_invert.clicked.connect(
+            self.btn_contrast_invert_callback)
+        self.btn_display_hist.clicked.connect(self.btn_display_hist_callback)
+        self.btn_display_color_hist.clicked.connect(
+            self.btn_display_color_hist_callback)
+        self.btn_compare.clicked.connect(self.btn_compare_callback)
+        self.btn_equalize_hist.clicked.connect(self.btn_equalize_hist_callback)
+        self.btn_contrast_stretch.clicked.connect(
+            self.btn_contrast_stretch_callback)
+        self.btn_log_compress.clicked.connect(self.btn_log_compress_callback)
+        self.btn_dload_jpeg.clicked.connect(self.btn_dload_jpeg_callback)
+        self.btn_dload_png.clicked.connect(self.btn_dload_png_callback)
+        self.btn_dload_tiff.clicked.connect(self.btn_dload_tiff_callback)
 
     def upload_callback(self):
 
@@ -150,25 +172,43 @@ class GUIMain(QMainWindow):
         # ensure selected row
         # get image IDs
         # request for image data
-        # display selected img
+        # display selected imgs
         pass
 
     def btn_contrast_invert_callback(self):
         # get requests comtrast_invert func
-        # display comtrast_invert img
+
         pass
 
-    def btn_display_hist(self):
+    def btn_display_hist_callback(self):
         # get requests img histogram
-        # display img_hist
         pass
 
-    def btn_display_color_hist(self):
+    def btn_display_color_hist_callback(self):
         # get requests color_histogram image
-        # display color histogra image
+
         pass
 
-    def btn_equalize_hist(self):
+    def btn_equalize_hist_callback(self):
         # get requests equalize hist image
-        # display eq
+        pass
+
+    def btn_contrast_stretch_callback(self):
+        # get requests contrast stretch
+        pass
+
+    def btn_log_compress_callback(self):
+        # get requests log compress
+        pass
+
+    def btn_dload_jpeg_callback(self):
+        # get requests jpeg img
+        pass
+
+    def btn_dload_tiff_callback(self):
+        # get requests tiff img
+        pass
+
+    def btn_dload_png_callback(self):
+        # get requests png img
         pass
