@@ -31,22 +31,22 @@ def server_on():
 
 @app.route("/api/upload/image", methods=["POST"])
 def on_POST_upload_image():
-    pass
+    return jsonify(api.upload_image(request.get_json()))
 
 
 @app.route("/api/upload/zip", methods=["POST"])
 def on_POST_upload_zip():
-    pass
+    return jsonify(api.upload_multiple_images(request.get_json()))
 
 
-@app.route('/api/image_info/all', methods=["GET"])
-def on_GET_images_info():
-    pass
+@app.route('/api/image_info/<user_hash>', methods=["GET"])
+def on_GET_images_info(user_hash):
+    return jsonify(api.get_image_info(user_hash))
 
 
 @app.route('/api/download/', methods=["GET"])
 def on_GET_download():
-    pass
+    return jsonify(api.download(request.get_json()))
 
 
 @app.route('/api/image_process', methods=["POST"])
