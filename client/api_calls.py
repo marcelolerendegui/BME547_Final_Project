@@ -18,35 +18,102 @@
 # You should have received a copy of the GNU General Public License
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
+import requests
+import base64
+from PIL import Image
+from io import BytesIO
+api_host = "http://127.0.0.1:5000"
 
 
 def check_user_password():
+
     pass
 
 
-def upload_images():
+def upload_image(image_id, filename):
+    image_json = {
+        "image_id": image_id,
+        "out_image_filename": filename
+    }
+    r = requests.post('http://127.0.0.1:5000/api/upload_image',
+                      json=image_json)
     pass
 
 
-def equalize_histogram():
+def upload_multiple_images(filename, user_hash):
+    image_json = {
+        "filename": filename,
+        "user_hash": user_hash,
+        "data": "The WHOLE zip file converted to a 64base string"
+    }
+    r = requests.post(api_host + '/api/upload/zip')
+    return r
+
+
+def equalize_histogram(image_id, image_format, filename):
+    data = {
+        'image_id': image_id,
+        'algorithm': 'Histogram Equalization',
+        'out_image_format': image_format,
+        'out_image_filename': filename
+    }
+    r = requests.post(api_host + '/api/img_proc', json=data)
+    return r
     pass
 
 
-def contrast_stretch():
+def contrast_stretch(image_id, image_format, filename):
+    data = {
+        'image_id': image_id,
+        'algorithm': 'Contrast Stretching',
+        'out_image_format': image_format,
+        'out_image_filename': filename
+    }
+    r = requests.post(api_host + '/api/img_proc', json=data)
+    return r
     pass
 
 
-def log_compress():
+def log_compress(image_id, image_format, filename):
+    data = {
+        'image_id': image_id,
+        'algorithm': 'Log Compression',
+        'out_image_format': image_format,
+        'out_image_filename': filename
+    }
+    r = requests.post(api_host + '/api/img_proc', json=data)
+    return r
     pass
 
 
-def convert():
+def convert(image_id, image_format, filename):
+    data = {
+        'image_id': image_id,
+        'algorithm': 'No Algorithm',
+        'out_image_format': image_format,
+        'out_image_filename': filename
+    }
+    r = requests.post(api_host + '/api/img_proc', json=data)
+    return r
     pass
 
 
-def contrast_invert():
+def contrast_invert(image_id, image_format, filename):
+    data = {
+        'image_id': image_id,
+        'algorithm': 'contrast_invert',
+        'out_image_format': image_format,
+        'out_image_filename': filename
+    }
+    r = requests.post(api_host + '/api/img_proc', json=data)
+    return r
     pass
 
 
-def download_images():
+def download_images(image_id, filename, image_format):
+    r = requests.get(api_host + 'port/api/download/' + image_id)
+    img = r.json()
+    im = Image.open(BytesIO(base64.b64decode(img)))
+    im.save(str(filename), str(image_format))
+    return im
     pass

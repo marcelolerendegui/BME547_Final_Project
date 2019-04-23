@@ -29,9 +29,10 @@ from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QDialog
-
+from PyQt5.QtWidgets import QMessageBox
 from client.GUIImageTable import GUIImageTable
 from client.GUIShowImage import ImageDisplayer
+from api_calls import *
 #
 # def test(a,b,c):
 #     """
@@ -176,8 +177,11 @@ class GUIMain(QMainWindow):
         pass
 
     def btn_contrast_invert_callback(self):
-        # get requests comtrast_invert func
-
+        # get requests contrast_invert func
+        # if no selection in get_table_selection()->ErrorMessage
+        # input = get_table_selection(self)
+        # if input==None:
+        #     self.warning_box()
         pass
 
     def btn_display_hist_callback(self):
@@ -211,4 +215,8 @@ class GUIMain(QMainWindow):
 
     def btn_dload_png_callback(self):
         # get requests png img
+
         pass
+
+    def warning_box(self):
+        QMessageBox.about(self, 'Errormessage', 'No image uploaded')
