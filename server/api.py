@@ -130,7 +130,44 @@ def download(download_images_dict: dict):
     if len(img_ids) == 1:
         return download_signle_image(image_id=img_ids[0], image_format=img_format, user_hash=user_hash)
     else:
-        pass
+        return download_multiple_images(image_id=img_ids, image_format=img_format, user_hash=user_hash)
+
+
+def download_multiple_images(image_ids: str, image_format: str, user_hash: str) -> dict:
+    names = []
+    datas = []
+    success = []
+    error_msg = []
+    out_dict = {}
+
+    for img_id in image_ids:
+        if db.image_exists(img_id, user_hash) == False:
+            success.append(False)
+            error_msg.append(
+                'No image id: ' +
+                image_id +
+                ' found for the user'
+            )
+        else:
+            image = db.get_image(img_id, user_hash)
+            if image is not None:
+                success.append(True)
+                img_bytes = b64str_to_fileio(image.data)
+                converted_image = img_proc.format_convert(
+                    img_bytes, image_format)
+                img_data = fileio_to_b64str(converted_image)
+                datas.append(img_data)
+                names.append(image.filename)
+            else:
+                success.append(False)
+                error_msg.append('Error fetching image')
+
+    b64_zip = create_base64zip_file(names, datas)
+    out_dict = {
+        'success': any(success == False),
+        'error_msg': '\n'.join(error_msg),
+        'data': b64_zip,
+    }
 
 
 def download_signle_image(image_id: str, image_format: str, user_hash: str) -> dict:
@@ -161,7 +198,7 @@ def create_base64zip_file(names: list, datas: list) -> str:
         for name, data in zip(names, datas):
             f.writestr(name, data)
     out_file.seek(0)
-    return out_file.read()
+    return fileio_to_b64str(out_file)
 
 
 def fileio_to_b64str(fileio):
@@ -189,4 +226,4 @@ def files_from_zip(zip_b64: str):
     with ZipFile(zip_bytes, 'r') as f:
         for name in names:
             file = zip_bytes.open(name, 'rb')
-            return name, file.read()
+            yield name, file.read()
