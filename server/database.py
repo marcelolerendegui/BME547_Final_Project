@@ -33,7 +33,13 @@ def init():
 
     mdb_user = os.environ.get('MONGODB_USER')  # xinyihang1
     mdb_pass = os.environ.get('MONGODB_PASS')  # 19950301
-    connect("mongodb+srv://xinyihang1:19950301@bme547-q262c.mongodb.net/Database")
+    connect(
+        'mongodb+srv: //' +
+        mdb_user +
+        ':' +
+        mdb_pass +
+        '@bme547-q262c.mongodb.net/Database'
+    )
     connection_str = "".join([
         "mongodb+srv://",
         mdb_user,

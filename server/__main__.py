@@ -20,6 +20,10 @@
 # If not, see <https://www.gnu.org/licenses/>.
 
 from server import app
+import logging
 
-app.run(host='0.0.0.0')
-# app.run(debug=True)
+logging.basicConfig(filename='server.log', level=logging.INFO)
+logging.info('Image Processing Server Started')
+
+# app.run(host='0.0.0.0')
+app.run(debug=True)

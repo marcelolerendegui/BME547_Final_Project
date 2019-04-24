@@ -51,7 +51,7 @@ def on_GET_download():
 
 @app.route('/api/image_process', methods=["POST"])
 def on_POST_image_process():
-    pass
+    return jsonify(api.image_process(request.get_json()))
 
 
 @app.route("/api/log", methods=["GET"])

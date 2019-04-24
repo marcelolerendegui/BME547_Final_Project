@@ -19,13 +19,14 @@
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
 
-from zipfile import ZipFile
-import base64
-import io
 from flask import Flask, jsonify, request
 from datetime import datetime
+from server.files import *
 import server.database as db
-server.img_proc_core import as img_proc
+import server.img_proc_core as img_proc
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def upload_image(upload_img_dict: dict) -> str:
@@ -48,7 +49,7 @@ def upload_image(upload_img_dict: dict) -> str:
         user_hash=upload_img_dict['user_hash'],
     )
 
-    if result == True:
+    if result is True:
         return {
             'sucess':	True,
             'error_msg': '',
@@ -91,7 +92,7 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> str:
             user_hash=img_uhash,
         )
 
-    if any(result) == False:
+    if any(result) is False:
         return {
             'sucess': False,
             'error_msg': 'Error adding: ' +
@@ -120,6 +121,8 @@ def get_image_info(user_hash: str):
 
 
 def download(download_images_dict: dict):
+    # TODO: VERIFY download_images_dict
+
     #   'image_ids' List of Image IDs of the images to download
     #   'format'    Image format to download
     #   'user_hash' A String with the user hash
@@ -128,12 +131,24 @@ def download(download_images_dict: dict):
     user_hash = download_images_dict['user_hash']
 
     if len(img_ids) == 1:
-        return download_signle_image(image_id=img_ids[0], image_format=img_format, user_hash=user_hash)
+        return download_signle_image(
+            image_id=img_ids[0],
+            image_format=img_format,
+            user_hash=user_hash
+        )
     else:
-        return download_multiple_images(image_id=img_ids, image_format=img_format, user_hash=user_hash)
+        return download_multiple_images(
+            image_ids=img_ids,
+            image_format=img_format,
+            user_hash=user_hash
+        )
 
 
-def download_multiple_images(image_ids: str, image_format: str, user_hash: str) -> dict:
+def download_multiple_images(
+    image_ids: str,
+    image_format: str,
+    user_hash: str
+) -> dict:
     names = []
     datas = []
     success = []
@@ -141,21 +156,21 @@ def download_multiple_images(image_ids: str, image_format: str, user_hash: str) 
     out_dict = {}
 
     for img_id in image_ids:
-        if db.image_exists(img_id, user_hash) == False:
+        if db.image_exists(img_id, user_hash) is False:
             success.append(False)
             error_msg.append(
                 'No image id: ' +
-                image_id +
+                img_id +
                 ' found for the user'
             )
         else:
             image = db.get_image(img_id, user_hash)
             if image is not None:
                 success.append(True)
-                img_bytes = b64str_to_fileio(image.data)
+                img_bytes = b64s_to_fileio(image.data)
                 converted_image = img_proc.format_convert(
                     img_bytes, image_format)
-                img_data = fileio_to_b64str(converted_image)
+                img_data = fileio_to_b64s(converted_image)
                 datas.append(img_data)
                 names.append(image.filename)
             else:
@@ -164,15 +179,19 @@ def download_multiple_images(image_ids: str, image_format: str, user_hash: str) 
 
     b64_zip = create_base64zip_file(names, datas)
     out_dict = {
-        'success': any(success == False),
+        'success': any(success is False),
         'error_msg': '\n'.join(error_msg),
         'data': b64_zip,
     }
 
 
-def download_signle_image(image_id: str, image_format: str, user_hash: str) -> dict:
+def download_signle_image(
+    image_id: str,
+    image_format: str,
+    user_hash: str
+) -> dict:
     out_dict = {}
-    if db.image_exists(image_id, user_hash) == False:
+    if db.image_exists(image_id, user_hash) is False:
         out_dict['success'] = False
         out_dict['error_msg'] = 'No image id: '+image_id+' found for the user'
         out_dict['data'] = ''
@@ -181,9 +200,9 @@ def download_signle_image(image_id: str, image_format: str, user_hash: str) -> d
         if image is not None:
             out_dict['success'] = True
             out_dict['error_msg'] = ''
-            img_bytes = b64str_to_fileio(image.data)
+            img_bytes = b64s_to_fileio(image.data)
             converted_image = img_proc.format_convert(img_bytes, image_format)
-            img_data = fileio_to_b64str(converted_image)
+            img_data = fileio_to_b64s(converted_image)
             out_dict['data'] = img_data
         else:
             out_dict['success'] = False
@@ -192,38 +211,76 @@ def download_signle_image(image_id: str, image_format: str, user_hash: str) -> d
     return out_dict
 
 
-def create_base64zip_file(names: list, datas: list) -> str:
-    out_file = io.BytesIO()
-    with ZipFile(out_file, 'w') as f:
-        for name, data in zip(names, datas):
-            f.writestr(name, data)
-    out_file.seek(0)
-    return fileio_to_b64str(out_file)
+def image_process(image_process_dict: dict) -> dict:
+    # TODO: VERIFY image_process_dict
+    # TODO: VERIFY algorithm
+
+    # 'image_id'	Image IDs of the images to process
+    # 'algorithm'	Algorithm to apply to the image
+    # 'out_image_format'	Format of the output processed image
+    # 'out_image_filename'	Filename of the output processed image
+
+    image_id = image_process_dict['image_process_dict']
+    algorithm = image_process_dict['algorithm']
+    out_image_format = image_process_dict['out_image_format']
+    out_image_filename = image_process_dict['out_image_filename']
+    user_hash = image_process_dict['user_hash']
+
+    success, errmsg, in_image = check_existance_and_fetch_image(
+        image_id,
+        user_hash
+    )
+
+    if success is False:
+        return {
+            'success': success,
+            'error_msg': errmsg,
+            'processing_time': 0.0
+        }
+
+    start_time = datetime.now()
+    in_image_data = b64s_to_fileio(in_image.data)
+    out_image = img_proc.transform_image(in_image_data, algorithm)
+    out_image = img_proc.format_convert(out_image, out_image_format)
+
+    db.add_image(
+        filename=out_image_filename,
+        img_format=out_image_format,
+        description='created from ' + in_image.filename,
+        size=get_image_size(out_image),
+        timestamp=datetime.now(),
+        data=fileio_to_b64s(out_image),
+        user_hash=user_hash
+    )
+    end_time = datetime.now()
+    ellapsed_time = end_time-start_time
+
+    return {
+        'success': success,
+        'error_msg': errmsg,
+        'processing_time': ellapsed_time.total_seconds
+    }
 
 
-def fileio_to_b64str(fileio):
-    b64_bytes = base64.b64encode(fileio)
-    return str(b64_bytes, encoding='utf-8')
+def check_existance_and_fetch_image(image_id: str, user_hash: str):
+    out_dict = {}
+    if db.image_exists(image_id, user_hash) is False:
+        return False,
+        'No image id: ' + image_id + ' found for the user',
+        None
+    else:
+        image = db.get_image(image_id, user_hash)
+        if image is not None:
+            return True,
+            '',
+            image
+        else:
+            return False,
+            'Error fetching image' + image_id,
+            None
 
 
-def b64str_to_fileio(file_b64: str):
-    image_bytes = base64.b64decode(file_b64)
-    return io.BytesIO(image_bytes)
-
-
-def filenames_in_zip(zip_b64: str):
-    zip_bytes = base64.b64decode(zip_b64)
-    with ZipFile(zip_bytes, 'r') as f:
-        names = f.namelist()
-    return names
-
-
-def files_from_zip(zip_b64: str):
-
-    names = filenames_in_zip(zip_b64)
-
-    zip_bytes = base64.b64decode(zip_b64)
-    with ZipFile(zip_bytes, 'r') as f:
-        for name in names:
-            file = zip_bytes.open(name, 'rb')
-            yield name, file.read()
+def b64_convert_image_b64(b64s_image: str, out_format: str):
+    img_bytes = b64s_to_fileio(b64s_image)
+    converted_image = img_proc.format_convert(img_bytes, out_format)
+    return fileio_to_b64s(converted_image)

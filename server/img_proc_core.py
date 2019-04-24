@@ -20,7 +20,6 @@
 # If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
-import cv2
 from skimage import data
 from skimage import img_as_float
 from skimage import util
@@ -29,18 +28,27 @@ from PIL import Image
 import io
 
 
-def get_image_size():
-    pass
+def get_image_size(image) -> str:
+    return ''
 
 
-def transform_image():
-    pass
+def transform_image(in_image, algorithm: str):
+    if algorithm == 'Histogram Equalization':
+        return in_image
+    elif algorithm == 'Contrast Stretching':
+        return in_image
+    elif algorithm == 'Log Compression':
+        return in_image
+    elif algorithm == 'Contrast Invert':
+        return in_image
+    elif algorithm == 'No Algorithm':
+        return in_image
+    else:
+        return in_image
 
 
 def histogram_equalization(image):
-    img_yuv = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
-    img_yuv[:, :, 0] = cv2.equalizeHist(img_yuv[:, :, 0])
-    img_output = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
+    img_output = exposure.equalize_hist(image)
     return img_output
 
 
