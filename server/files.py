@@ -25,38 +25,33 @@ import base64
 import io
 
 
-def fileio_to_b64s(fileio):
-    b64_bytes = base64.b64encode(fileio)
-    return str(b64_bytes, encoding='utf-8')
+def s_to_fio(s):
+    fio = io.BytesIO(s.encode('utf8'))
+    return fio
 
 
-def b64s_to_fileio(file_b64: str):
-    image_bytes = base64.b64decode(file_b64)
-    return io.BytesIO(image_bytes)
+def fio_to_s(fio):
+    s = fio.read().decode('utf8')
+    return s
 
 
-def create_zip_file(names: list, datas: list):
-    out_file = io.BytesIO()
-    with ZipFile(out_file, 'w') as f:
+def fio_to_b64s(fio):
+    b64s = str(base64.b64encode(fio.read()), encoding='utf-8')
+    return b64s
+
+
+def b64s_to_fio(b64s: str):
+    fio = io.BytesIO(base64.b64decode(b64s))
+    return fio
+
+
+def create_zip_fio(names: list, datas: list):
+    out_fio = io.BytesIO()
+    with ZipFile(out_fio, 'w') as f:
         for name, data in zip(names, datas):
             f.writestr(name, data)
-    out_file.seek(0)
-    return out_file
-
-
-def create_base64zip_file(names: list, datas: list) -> str:
-    out_file = io.BytesIO()
-    with ZipFile(out_file, 'w') as f:
-        for name, data in zip(names, datas):
-            f.writestr(name, data)
-    out_file.seek(0)
-    return fileio_to_b64s(out_file)
-
-
-def filenames_in_zip(zip_bytes) -> list:
-    with ZipFile(zip_bytes, 'r') as f:
-        names = f.namelist()
-    return names
+    out_fio.seek(0)
+    return out_fio
 
 
 def files_from_zip(zip_bytes):

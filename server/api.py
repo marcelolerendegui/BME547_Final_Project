@@ -177,11 +177,11 @@ def download_multiple_images(
                 success.append(False)
                 error_msg.append('Error fetching image')
 
-    b64_zip = create_base64zip_file(names, datas)
+    zip_fio = create_zip_fio(names, datas)
     out_dict = {
         'success': any(success is False),
         'error_msg': '\n'.join(error_msg),
-        'data': b64_zip,
+        'data': fio_to_b64(zip_fio),
     }
 
 
