@@ -28,27 +28,53 @@ from PIL import Image
 import io
 
 
-def get_image_size(image) -> str:
-    return ''
+def is_image(img_fio) -> bool:
+    try:
+        Image.open(img_fio)
+        return True
+    except:
+        return False
 
 
-def transform_image(in_image, algorithm: str):
+def get_image_size(img_fio) -> str:
+    img = Image.open(img_fio)
+    width, height = img.size
+    return str(width) + 'x' + str(height)
+
+
+def get_image_format(img_fio) -> str:
+    img = Image.open(img_fio)
+    return img.format
+
+
+def is_valid_algorithm(algorithm: str) -> bool:
+    available_algorithms = [
+        'Histogram Equalization',
+        'Contrast Stretching',
+        'Log Compression',
+        'Contrast Invert',
+        'No Algorithm',
+    ]
+    return algorithm in available_algorithms
+
+
+def transform_image(img_fio, algorithm: str):
     if algorithm == 'Histogram Equalization':
-        return in_image
+        return img_fio
     elif algorithm == 'Contrast Stretching':
-        return in_image
+        return img_fio
     elif algorithm == 'Log Compression':
-        return in_image
+        return img_fio
     elif algorithm == 'Contrast Invert':
-        return in_image
+        return img_fio
     elif algorithm == 'No Algorithm':
-        return in_image
+        return img_fio
     else:
-        return in_image
+        return img_fio
 
 
-def histogram_equalization(image):
-    img_output = exposure.equalize_hist(image)
+def histogram_equalization(img_fio):
+    img_output = exposure.equalize_hist(img_fio)
     return img_output
 
 

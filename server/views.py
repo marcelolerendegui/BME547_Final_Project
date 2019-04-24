@@ -26,7 +26,7 @@ import server.api as api
 
 @app.route("/", methods=["GET"])
 def server_on():
-    pass
+    return jsonify("Image Processing Server ON")
 
 
 @app.route("/api/upload/image", methods=["POST"])
@@ -56,4 +56,4 @@ def on_POST_image_process():
 
 @app.route("/api/log", methods=["GET"])
 def on_GET_log():
-    pass
+    return jsonify(api.get_log())

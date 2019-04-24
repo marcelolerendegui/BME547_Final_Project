@@ -22,6 +22,7 @@
 from flask import Flask, jsonify, request
 from datetime import datetime
 from server.files import *
+from server.verification import is_type_ok
 import server.database as db
 import server.img_proc_core as img_proc
 
@@ -29,21 +30,47 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def upload_image(upload_img_dict: dict) -> str:
-    # TODO: VERIFY upload_img_dict
-    # TODO: VERIFY upload_img_dict['data'] (correct type, etc)
-    # TODO: extract size from upload_img_dict['data']
+def upload_image(upload_img_dict: dict) -> dict:
 
-    #   'filename'	String with the name of the file
-    #   'format'	String with the format of the file: PNG, JPEG or TIFF
-    #   'user_hash'	A String with the user hash
-    #   'data'	    The WHOLE file converted to a 64base string.
+    # Verify input types
+    t_ok, t_err = is_type_ok(
+        upload_img_dict,
+        """
+        dict{
+            'filename': str,
+            'description': str,
+            'data': str,
+            'user_hash': str
+        }
+        """
+    )
 
+    if t_ok is False:
+        return {
+            'sucess':	False,
+            'error_msg': t_err,
+        }
+
+    # Create image file IO
+    image_fio = b64s_to_fio(upload_img_dict['data'])
+
+    # Verify that the received data is actually an image
+    if img_proc.is_image(image_fio) is False:
+        return {
+            'sucess':	False,
+            'error_msg':
+            'image_data cant be identified as an image file in base64 string format',
+        }
+    # Extract size and format from image data
+    im_size = img_proc.get_image_size(image_fio)
+    im_format = img_proc.get_image_format(image_fio)
+
+    # Store the new image in the database
     result = db.add_image(
         filename=upload_img_dict['filename'],
-        img_format=upload_img_dict['format'],
+        img_format=im_format,
         description=upload_img_dict['description'],
-        size=upload_img_dict['size'],
+        size=im_size,
         timestamp=datetime.now(),
         data=upload_img_dict['data'],
         user_hash=upload_img_dict['user_hash'],
@@ -61,71 +88,122 @@ def upload_image(upload_img_dict: dict) -> str:
         }
 
 
-def upload_multiple_images(upload_mult_img_dict: dict) -> str:
-    # TODO: VERIFY upload_mult_img_dict
-    # TODO: VERIFY upload_mult_img_dict['data'] (zip file with images)
-    # TODO: extract imagesfrom upload_img_dict['data']
-    # 'filename'	String with the name of the zip file
-    # 'user_hash'	A String with the user hash
-    # 'data'	The WHOLE zip file converted to a 64base string.
-    zip_bytes = upload_mult_img_dict['data']
+def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
 
+    # Verify input types
+    t_ok, t_err = is_type_ok(
+        upload_mult_img_dict,
+        """
+        dict{
+            'filename': str,
+            'user_hash': str,
+            'data': str,
+        }
+        """
+    )
+
+    if t_ok is False:
+        return {
+            'sucess':	False,
+            'error_msg': t_err,
+        }
+
+    user_hash = upload_mult_img_dict['user_hash']
+
+    zip_fio = b64s_to_fio(upload_mult_img_dict['data'])
+
+    # Verify that the received data is actually a zip file
+    if is_zip(zip_fio) is False:
+        return {
+            'sucess':	False,
+            'error_msg':
+            'image_data cant be identified as a zip file in base64 string format',
+        }
+
+    # Process each file inside the zip
     result = []
-    names = []
-    for name, data in files_from_zip(zip_bytes):
-        img_name = name
-        img_data = data
-        img_desc = "extracted from" + upload_mult_img_dict['filename']
-        img_uhash = upload_mult_img_dict['user_hash']
-        img_size = get_image_size()  # TODO
-        img_format = get_image_format()  # TODO
-
-        names.append(name)
-
-        result.append = db.add_image(
-            filename=img_name,
-            img_format=img_format,
-            description=img_desc,
-            size=img_size,
+    err = []
+    for name, image_fio in files_from_zip(zip_fio):
+        # Verify that the current file is actually an image
+        if img_proc.is_image(image_fio) is False:
+            result.append(False)
+            err.append(
+                name +
+                'file can not be identified as an image. Ignored \n'
+            )
+            continue
+        # Extract size and format from image data
+        im_size = img_proc.get_image_size(image_fio)
+        im_format = img_proc.get_image_format(image_fio)
+        # Store the new image in the database
+        result = db.add_image(
+            filename=name,
+            img_format=im_format,
+            description="extracted from" + upload_mult_img_dict['filename'],
+            size=im_size,
             timestamp=datetime.now(),
-            data=img_data,
-            user_hash=img_uhash,
+            data=fio_to_b64s(image_fio),
+            user_hash=user_hash,
         )
+        if result is False:
+            result.append(False)
+            err.append(
+                'Error adding image' +
+                name +
+                ' to database\n'
+            )
 
-    if any(result) is False:
-        return {
-            'sucess': False,
-            'error_msg': 'Error adding: ' +
-            ','.join([n for n, r in zip(name, result) if r]) +
-            ' to database',
-        }
-    else:
-        return {
-            'sucess':	True,
-            'error_msg': '',
-        }
+    # return all the error messages
+    return {
+        'sucess':	all(result),
+        'error_msg': '\n'.join(err),
+    }
 
 
 def get_image_info(user_hash: str):
+    # Verify input types
+    t_ok, t_err = is_type_ok(
+        user_hash,
+        "str"
+    )
+    if t_ok is False:
+        return {
+            'sucess':	False,
+            'error_msg': t_err,
+        }
+
     images = db.get_all_user_images(user_hash)
     out_dict = {}
-    for img in images:
-        out_dict[img.image_id] = {
-            'filename': img.filename,
-            'img_format': img.img_format,
-            'timestamp': img.timestamp,
-            'size': img.size,
-            'description': img.description,
-        }
+    if images is not None:
+        for img in images:
+            out_dict[img.image_id] = {
+                'filename': img.filename,
+                'img_format': img.img_format,
+                'timestamp': img.timestamp,
+                'size': img.size,
+                'description': img.description,
+            }
     return out_dict
 
 
 def download(download_images_dict: dict):
-    # TODO: VERIFY download_images_dict
+    # Verify input types
+    t_ok, t_err = is_type_ok(
+        download_images_dict,
+        """
+        dict{
+            'image_ids': list[str...],
+            'format': str,
+            'user_hash': str
+        }
+        """
+    )
+    if t_ok is False:
+        return {
+            'sucess':	False,
+            'error_msg': t_err,
+        }
 
-    #   'image_ids' List of Image IDs of the images to download
-    #   'format'    Image format to download
-    #   'user_hash' A String with the user hash
     img_ids = download_images_dict['image_ids']
     img_format = download_images_dict['format']
     user_hash = download_images_dict['user_hash']
@@ -144,126 +222,175 @@ def download(download_images_dict: dict):
         )
 
 
-def download_multiple_images(
-    image_ids: str,
-    image_format: str,
-    user_hash: str
-) -> dict:
-    names = []
-    datas = []
-    success = []
-    error_msg = []
-    out_dict = {}
-
-    for img_id in image_ids:
-        if db.image_exists(img_id, user_hash) is False:
-            success.append(False)
-            error_msg.append(
-                'No image id: ' +
-                img_id +
-                ' found for the user'
-            )
-        else:
-            image = db.get_image(img_id, user_hash)
-            if image is not None:
-                success.append(True)
-                img_bytes = b64s_to_fileio(image.data)
-                converted_image = img_proc.format_convert(
-                    img_bytes, image_format)
-                img_data = fileio_to_b64s(converted_image)
-                datas.append(img_data)
-                names.append(image.filename)
-            else:
-                success.append(False)
-                error_msg.append('Error fetching image')
-
-    zip_fio = create_zip_fio(names, datas)
-    out_dict = {
-        'success': any(success is False),
-        'error_msg': '\n'.join(error_msg),
-        'data': fio_to_b64(zip_fio),
-    }
-
-
 def download_signle_image(
     image_id: str,
     image_format: str,
     user_hash: str
 ) -> dict:
-    out_dict = {}
+
+    # Check if image does not exist
     if db.image_exists(image_id, user_hash) is False:
-        out_dict['success'] = False
-        out_dict['error_msg'] = 'No image id: '+image_id+' found for the user'
-        out_dict['data'] = ''
-    else:
-        image = db.get_image(image_id, user_hash)
-        if image is not None:
-            out_dict['success'] = True
-            out_dict['error_msg'] = ''
-            img_bytes = b64s_to_fileio(image.data)
-            converted_image = img_proc.format_convert(img_bytes, image_format)
-            img_data = fileio_to_b64s(converted_image)
-            out_dict['data'] = img_data
-        else:
-            out_dict['success'] = False
-            out_dict['error_msg'] = 'Error fetching image'
-            out_dict['data'] = ''
-    return out_dict
+        return {
+            'success': False,
+            'error_msg': 'No image id: '+image_id+' found for the user',
+            'data': '',
+        }
+
+    # Get The image
+    image = db.get_image(image_id, user_hash)
+    if image is None:
+        return {
+            'success': False,
+            'error_msg': 'Error fetching image',
+            'data': '',
+        }
+
+    image_fio = b64s_to_fio(image.data)
+    converted_image_fio = img_proc.format_convert(image_fio, image_format)
+
+    return {
+        'success': True,
+        'error_msg': '',
+        'data': fio_to_b64s(converted_image_fio),
+    }
+
+
+def download_multiple_images(
+    image_ids: str,
+    image_format: str,
+    user_hash: str
+) -> dict:
+
+    names = []
+    datas = []
+    success = []
+    error_msg = []
+
+    for img_id in image_ids:
+
+        # Check if image id exists (and fetch it)
+        result, errmsg, image = check_existance_and_fetch_image(
+            img_id,
+            user_hash
+        )
+
+        if result is False:
+            success.append(False)
+            error_msg.append(errmsg)
+            continue
+
+        # Convert image
+        image_fio = b64s_to_fio(image.data)
+        converted_image_fio = img_proc.format_convert(
+            image_fio,
+            image_format
+        )
+        image_b64s = fio_to_b64s(converted_image_fio)
+
+        # Save data to generate zip file
+        success.append(True)
+        datas.append(image_b64s)
+        names.append(image.filename)
+
+    # Create zip file using the saved names and data
+    zip_fio = create_zip_fio(names, datas)
+    # Retur the zipfile in b64s and errors
+    return {
+        'success': all(success),
+        'error_msg': '\n'.join(error_msg),
+        'data': fio_to_b64s(zip_fio),
+    }
 
 
 def image_process(image_process_dict: dict) -> dict:
-    # TODO: VERIFY image_process_dict
-    # TODO: VERIFY algorithm
+    # Verify input types
+    t_ok, t_err = is_type_ok(
+        image_process_dict,
+        """
+        dict{
+            'image_id': str,
+            'algorithm':str,
+            'out_image_format': str,
+            'out_image_filename':str,
+            'user_hash': str,
+        }
+        """
+    )
+    if t_ok is False:
+        return {
+            'sucess':	False,
+            'error_msg': t_err,
+        }
 
-    # 'image_id'	Image IDs of the images to process
-    # 'algorithm'	Algorithm to apply to the image
-    # 'out_image_format'	Format of the output processed image
-    # 'out_image_filename'	Filename of the output processed image
-
-    image_id = image_process_dict['image_process_dict']
+    image_id = image_process_dict['image_id']
     algorithm = image_process_dict['algorithm']
     out_image_format = image_process_dict['out_image_format']
     out_image_filename = image_process_dict['out_image_filename']
     user_hash = image_process_dict['user_hash']
 
-    success, errmsg, in_image = check_existance_and_fetch_image(
+    # Check if algorithm is correct
+    if img_proc.is_valid_algorithm(algorithm) is False:
+        return {
+            'success': False,
+            'error_msg': 'Unknown algorithm: ' + algorithm,
+            'processing_time': 0.0
+        }
+
+    # Check if image exists and fetch it
+    result, errmsg, in_image = check_existance_and_fetch_image(
         image_id,
         user_hash
     )
 
-    if success is False:
+    if result is False:
         return {
-            'success': success,
+            'success': result,
             'error_msg': errmsg,
             'processing_time': 0.0
         }
 
     start_time = datetime.now()
-    in_image_data = b64s_to_fileio(in_image.data)
-    out_image = img_proc.transform_image(in_image_data, algorithm)
-    out_image = img_proc.format_convert(out_image, out_image_format)
+    image_fio = b64s_to_fio(in_image.data)
 
-    db.add_image(
+    # Extract size from image data
+    im_size = img_proc.get_image_size(image_fio)
+
+    # Transform image using algorithm
+    out_image_fio = img_proc.transform_image(image_fio, algorithm)
+
+    # Convert image format
+    out_image_fio = img_proc.format_convert(out_image_fio, out_image_format)
+
+    result = db.add_image(
         filename=out_image_filename,
         img_format=out_image_format,
         description='created from ' + in_image.filename,
-        size=get_image_size(out_image),
+        size=im_size,
         timestamp=datetime.now(),
-        data=fileio_to_b64s(out_image),
+        data=fio_to_b64s(out_image_fio),
         user_hash=user_hash
     )
+
+    if result is False:
+        return {
+            'success': False,
+            'error_msg': 'Error adding image' +
+            out_image_filename +
+            ' to database\n',
+            'processing_time': 0.0
+        }
+
     end_time = datetime.now()
     ellapsed_time = end_time-start_time
 
     return {
-        'success': success,
-        'error_msg': errmsg,
+        'success': True,
+        'error_msg': '',
         'processing_time': ellapsed_time.total_seconds
     }
 
 
 def check_existance_and_fetch_image(image_id: str, user_hash: str):
-    out_dict = {}
     if db.image_exists(image_id, user_hash) is False:
         return False,
         'No image id: ' + image_id + ' found for the user',
@@ -280,7 +407,5 @@ def check_existance_and_fetch_image(image_id: str, user_hash: str):
             None
 
 
-def b64_convert_image_b64(b64s_image: str, out_format: str):
-    img_bytes = b64s_to_fileio(b64s_image)
-    converted_image = img_proc.format_convert(img_bytes, out_format)
-    return fileio_to_b64s(converted_image)
+def get_log():
+    return ''
