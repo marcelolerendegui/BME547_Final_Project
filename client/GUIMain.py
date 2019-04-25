@@ -131,21 +131,38 @@ class GUIMain(QMainWindow):
         self.btn_contrast_stretch.clicked.connect(
             self.btn_contrast_stretch_callback)
         self.btn_log_compress.clicked.connect(self.btn_log_compress_callback)
-        self.btn_dload_jpeg.clicked.connect(self.btn_dload_jpeg_callback)
-        self.btn_dload_png.clicked.connect(self.btn_dload_png_callback)
-        self.btn_dload_tiff.clicked.connect(self.btn_dload_tiff_callback)
+        self.btn_dload_jpeg.clicked.connect(self.download_images_jpg)
+        self.btn_dload_png.clicked.connect(self.download_images_png)
+        self.btn_dload_tiff.clicked.connect(self.download_images_tiff)
 
     def btn_upload_callback(self):
 
         # Create File Select Dialog
         dialog = QFileDialog(parent=self, caption='Images')
-        dialog.setMimeTypeFilters(["image/jpeg", "image/png", "image/tiff"])
-        dialog.setFileMode(QFileDialog.ExistingFiles)
+        dialog.setMimeTypeFilters(
+            ["image/jpeg", "image/png", "image/tiff", 'application/zip'])
+        dialog.setFileMode(QFileDialog.ExistingFile)
 
         if dialog.exec_() == QDialog.Accepted:
-            print(dialog.selectedFiles())
 
-        # Call API upload Files/ multiple?
+            filename = dialog.selectedFiles()[0]
+
+            with open(filename, 'rb') as f:
+                file_b64s = fio_to_b64s(f)
+
+                if ext_from_path(filename) == '.zip':
+                    ret = api.upload_zip(
+                        file_b64s,
+                        nameext_from_path(filename),
+                        self.user_hash
+                    )
+                    print(ret)
+                else:
+                    ret = api.upload_image(
+                        file_b64s,
+                        nameext_from_path(filename),
+                        self.user_hash
+                    )
 
         self.update_table()
 
@@ -232,3 +249,51 @@ class GUIMain(QMainWindow):
 
     def on_process_done(self):
         QMessageBox.about(self, 'Process Done', 'Process Done')
+
+    def download_images_jpg(self):
+        self.download_images('JPEG')
+
+    def download_images_png(self):
+        self.download_images('PNG')
+
+    def download_images_tiff(self):
+        self.download_images('TIFF')
+
+    def download_images(self, im_format):
+        rows = self.tbl_images.get_selected_rows()
+        ids = []
+        names = []
+        for r in rows:
+            ids.append(self.tbl_images.item(r, 0).text())
+            names.append(self.tbl_images.item(r, 1).text())
+
+        if len(ids) == 1:
+
+            # Create File Save Dialog
+            dialog = QFileDialog(parent=self, caption='111Save As..')
+
+            dialog.setMimeTypeFilters(["image/"+im_format.lower()])
+            dialog.setFileMode(QFileDialog.AnyFile)
+
+            if dialog.exec_() == QDialog.Accepted:
+                filename = dialog.selectedFiles()[0]
+                dout = api.get_download_images(ids, im_format, self.user_hash)
+                image_b = b64s_to_b(dout['data'])
+                with open(filename, 'wb+') as f:
+                    f.write(image_b)
+
+        elif len(ids) >= 1:
+
+            # Create File Save Dialog
+            dialog = QFileDialog(parent=self, caption='222Save As..')
+            dialog.setMimeTypeFilters(['application/zip'])
+            dialog.setFileMode(QFileDialog.AnyFile)
+
+            if dialog.exec_() == QDialog.Accepted:
+                filename = dialog.selectedFiles()[0]
+                dout = api.get_download_images(ids, im_format, self.user_hash)
+                image_b = b64s_to_b(dout['data'])
+                with open(filename, 'wb+') as f:
+                    f.write(image_b)
+        else:
+            return

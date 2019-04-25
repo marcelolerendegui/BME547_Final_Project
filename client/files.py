@@ -134,3 +134,8 @@ def is_zip(zip_fio: fileIO) -> bool:
 def nameext_from_path(path: str) -> str:
     nameext = os.path.split(path)[-1]
     return nameext
+
+
+def ext_from_path(path: str) -> str:
+    ext = os.path.splitext(path)[-1]
+    return ext

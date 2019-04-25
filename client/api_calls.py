@@ -26,6 +26,16 @@ from io import BytesIO
 api_host = "http://127.0.0.1:5000"
 
 
+def get_download_images(image_ids: str, im_format: str, user_hash: str):
+    d = {
+        'image_ids': image_ids,
+        'format': im_format,
+        'user_hash': user_hash
+    }
+    r = requests.get(api_host+"/api/download/", json=d)
+    return json.loads(r.text)
+
+
 def get_single_image(image_id: str, user_hash: str):
     d = {
         'image_ids': [image_id],
@@ -41,15 +51,25 @@ def get_images_info(user_hash: str):
     return json.loads(r.text)
 
 
-def upload_image(image_id, filename):
-    image_dic = {
-        "image_id": image_id,
-        "out_image_filename": filename
+def upload_image(image_b64s, filename, user_hash):
+    d = {
+        'filename': filename,
+        'user_hash': user_hash,
+        'description': filename,
+        'data': image_b64s,
     }
-    r = requests.post(api_host + 'api/upload/image',
-                      json=image_dic)
-    return r
-    pass
+    r = requests.post(api_host+"/api/upload/image", json=d)
+    return json.loads(r.text)
+
+
+def upload_zip(zip_b64s, filename, user_hash):
+    d = {
+        'filename': filename,
+        'user_hash': user_hash,
+        'data': zip_b64s,
+    }
+    r = requests.post(api_host+"/api/upload/zip", json=d)
+    return json.loads(r.text)
 
 
 def upload_multiple_images(filename, user_hash):
