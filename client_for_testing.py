@@ -77,7 +77,12 @@ r6 = requests.post(server+"/api/image_process", json=d6)
 
 # DOWNLOAD MULTIPLE IMAGE
 d7 = {
-    'image_ids': ['5cc1f1484be362389edd1a0e', '5cc20e864be36254d29598ed', '5cc20e864be36254d29598ee', '5cc20e874be36254d29598f3'],
+    'image_ids': [
+        '5cc1f1484be362389edd1a0e',
+        '5cc20e864be36254d29598ed',
+        '5cc20e864be36254d29598ee',
+        '5cc20e874be36254d29598f3'
+    ],
     'format': 'PNG',
     'user_hash': user_hash
 }

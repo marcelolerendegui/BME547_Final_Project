@@ -59,7 +59,7 @@ def upload_image(upload_img_dict: dict) -> dict:
         return {
             'sucess':	False,
             'error_msg':
-            'image_data cant be identified as an image file in base64 string format',
+            'image_data cant be identified as an base64 formatted image file',
         }
     # Extract size and format from image data
     im_size = img_proc.get_image_size(image_fio)
