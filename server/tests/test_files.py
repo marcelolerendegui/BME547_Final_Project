@@ -26,6 +26,7 @@ def test_conversion():
         ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
         ('~!@#$%^&*()_+=[]{};:",.<>/?'),
         ("~!@#$%^&*()_+=[]{};:',.<>/?"),
+        ('0123456789abcdefghijABCDEFGHIJ~!@#$%^&*(~!@#$%^&*('),
     ]
 )
 def test_s_b_s(in_s):

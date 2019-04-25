@@ -39,6 +39,7 @@ def s_to_b64s(s: str) -> str:
 
 def s_to_fio(s: str) -> fileIO:
     fio = io.BytesIO(s.encode('utf8'))
+    fio.seek(0)
     return fio
 
 
@@ -54,6 +55,7 @@ def b_to_b64s(b: bytes) -> str:
 
 def b_to_fio(b: bytes):
     fio = io.BytesIO(b)
+    fio.seek(0)
     return fio
 
 
@@ -69,35 +71,39 @@ def b64s_to_s(b64s: str) -> str:
 
 def b64s_to_fio(b64s: str) -> fileIO:
     fio = io.BytesIO(base64.b64decode(b64s.encode('utf8')))
+    fio.seek(0)
     return fio
 
 
 def fio_to_b(fio: fileIO) -> bytes:
     fio.seek(0)
     b = fio.read()
+    fio.seek(0)
     return b
 
 
 def fio_to_s(fio: fileIO) -> str:
     fio.seek(0)
     s = fio.read().decode('utf8')
+    fio.seek(0)
     return s
 
 
 def fio_to_b64s(fio: fileIO) -> str:
     fio.seek(0)
     b64s = base64.b64encode(fio.read()).decode('utf8')
+    fio.seek(0)
     return b64s
 
 
-def create_zip_fio(names: list, datas: list) -> fileIO:
+def create_zip_fio(names_s: list, datas_b64s: list) -> fileIO:
     # Create empty bytesIO
     out_fio = io.BytesIO()
     # Open it as a zip
     with ZipFile(out_fio, 'w') as f:
         # Write each data to a file called name
-        for name, data in zip(names, datas):
-            f.writestr(name, s_to_b(data))
+        for name, data in zip(names_s, datas_b64s):
+            f.writestr(name, b64s_to_b(data))
     # Don't forget to rewind
     out_fio.seek(0)
     return out_fio
@@ -106,14 +112,11 @@ def create_zip_fio(names: list, datas: list) -> fileIO:
 def files_from_zip(zip_fio: fileIO):
     # Open zip file to read
     with ZipFile(zip_fio, 'r') as f:
-
         # Extract list of fullpath filenames
         names = f.namelist()
-
         for name in names:
             # Extract name and extension
             nameext = nameext_from_path(name)
-
             # If it's not a directory yield nameext and data
             if nameext != '':
                 file = f.open(name, 'r')

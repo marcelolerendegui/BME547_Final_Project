@@ -329,6 +329,7 @@ def download_signle_image(
 ) -> dict:
 
     # Check if image id exists (and fetch it)
+
     result, errmsg, image = check_existance_and_fetch_image(
         image_id,
         user_hash
@@ -390,6 +391,7 @@ def download_multiple_images(
 
     # Create zip file using the saved names and data
     zip_fio = create_zip_fio(names, datas)
+
     # Retur the zipfile in b64s and errors
     return {
         'success': all(success),
@@ -440,7 +442,7 @@ def image_process(image_process_dict: dict) -> dict:
 
     if result is False:
         return {
-            'success': result,
+            'success': False,
             'error_msg': errmsg,
             'processing_time': 0.0
         }
@@ -485,7 +487,7 @@ def image_process(image_process_dict: dict) -> dict:
     return {
         'success': True,
         'error_msg': '',
-        'processing_time': ellapsed_time.total_seconds
+        'processing_time': ellapsed_time.total_seconds()
     }
 
 
@@ -495,9 +497,7 @@ def get_log():
 
 def check_existance_and_fetch_image(image_id: str, user_hash: str):
     if db.image_exists(image_id, user_hash) is False:
-        return False,
-        'No image id: ' + image_id + ' found for the user',
-        None
+        return False, 'No image id: ' + image_id + ' found for the user', None
     else:
         image = db.get_image(image_id, user_hash)
         if image is not None:
