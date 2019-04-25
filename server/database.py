@@ -32,8 +32,8 @@ def init():
 
     """
 
-    mdb_user = 'xinyihang1'  # os.environ.get('MONGODB_USER')
-    mdb_pass = '19950301'  # os.environ.get('MONGODB_PASS')
+    mdb_user = os.environ.get('MONGODB_USER')
+    mdb_pass = os.environ.get('MONGODB_PASS')
 
     connection_str = "".join([
         "mongodb+srv://",
