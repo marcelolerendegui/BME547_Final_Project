@@ -44,6 +44,16 @@ def on_GET_images_info(user_hash):
     return jsonify(api.get_image_info(user_hash))
 
 
+@app.route('/api/edit/description', methods=["POST"])
+def on_POST_edit_description():
+    return jsonify(api.edit_image_description(request.get_json()))
+
+
+@app.route('/api/edit/filename', methods=["POST"])
+def on_POST_edit_filename():
+    return jsonify(api.edit_image_filename(request.get_json()))
+
+
 @app.route('/api/download/', methods=["GET"])
 def on_GET_download():
     return jsonify(api.download(request.get_json()))

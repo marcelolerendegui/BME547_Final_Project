@@ -3,6 +3,8 @@ from server.files import b64s_to_fio
 from server.files import fio_to_s
 from server.files import s_to_fio
 
+import pytest
+
 
 def test_conversion():
     in_message = 'This is a Message!'
@@ -16,11 +18,20 @@ def test_conversion():
     assert out_message == in_message
 
 
-def test_s_b_s():
+@pytest.mark.parametrize(
+    "in_s",
+    [
+        ('0123456789'),
+        ('abcdefghijklmnopqrstuvwxyz'),
+        ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+        ('~!@#$%^&*()_+=[]{};:",.<>/?'),
+        ("~!@#$%^&*()_+=[]{};:',.<>/?"),
+    ]
+)
+def test_s_b_s(in_s):
     from server.files import s_to_b
     from server.files import b_to_s
 
-    in_s = 'This is a Message!'
     b = s_to_b(in_s)
     out_s = b_to_s(b)
 

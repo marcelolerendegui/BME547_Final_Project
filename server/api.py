@@ -186,6 +186,22 @@ def get_image_info(user_hash: str):
     return out_dict
 
 
+def edit_image_description(edit_image_description_dict: dict):
+    # Verify input types
+    # Check if image id exists (and fetch it)
+    # Edit Description
+    # Save image
+    return 'EDIT IMAGE DESCRIPTION'
+
+
+def edit_image_filename(edit_image_filename_dict: dict):
+    # Verify input types
+    # Check if image id exists (and fetch it)
+    # Edit filename
+    # Save image
+    return 'EDIT IMAGE FILENAME'
+
+
 def download(download_images_dict: dict):
     # Verify input types
     t_ok, t_err = is_type_ok(
@@ -228,20 +244,16 @@ def download_signle_image(
     user_hash: str
 ) -> dict:
 
-    # Check if image does not exist
-    if db.image_exists(image_id, user_hash) is False:
-        return {
-            'success': False,
-            'error_msg': 'No image id: '+image_id+' found for the user',
-            'data': '',
-        }
+    # Check if image id exists (and fetch it)
+    result, errmsg, image = check_existance_and_fetch_image(
+        image_id,
+        user_hash
+    )
 
-    # Get The image
-    image = db.get_image(image_id, user_hash)
-    if image is None:
+    if result is False:
         return {
             'success': False,
-            'error_msg': 'Error fetching image',
+            'error_msg': errmsg,
             'data': '',
         }
 
@@ -390,6 +402,10 @@ def image_process(image_process_dict: dict) -> dict:
     }
 
 
+def get_log():
+    return ''
+
+
 def check_existance_and_fetch_image(image_id: str, user_hash: str):
     if db.image_exists(image_id, user_hash) is False:
         return False,
@@ -405,7 +421,3 @@ def check_existance_and_fetch_image(image_id: str, user_hash: str):
             return False,
             'Error fetching image' + image_id,
             None
-
-
-def get_log():
-    return ''
