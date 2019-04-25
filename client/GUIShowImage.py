@@ -19,6 +19,8 @@
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
 
+from PIL import Image
+from PIL.ImageQt import ImageQt
 from PyQt5 import QtCore, QtGui
 
 from PyQt5.QtCore import QObject
@@ -28,6 +30,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QLabel
 
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QImage
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QVBoxLayout
@@ -40,7 +43,7 @@ class ImageDisplayer(QObject):
         # List of display windows open
         self.img_displays = {}
 
-    def new_display(self):
+    def new_display(self, image_fio, filename: str):
 
         if len(self.img_displays.keys()) > 0:
             max_index = max(self.img_displays.keys())
@@ -54,31 +57,37 @@ class ImageDisplayer(QObject):
                 new_index = max_index + 1
         else:
             new_index = 1
-        self.img_displays[new_index] = GUIShowImage(new_index)
+        self.img_displays[new_index] = GUIShowImage(
+            new_index, image_fio, filename)
         self.img_displays[new_index].show()
         self.img_displays[new_index].on_close.connect(
             self.delete_display
         )
-        print("New Display Created: ", new_index)
 
     @pyqtSlot(int)
     def delete_display(self, val):
-        print("Display Deleted: ", val)
         del self.img_displays[val]
 
 
 class GUIShowImage(QMainWindow):
     on_close = QtCore.pyqtSignal(int)
 
-    def __init__(self, display_key, selected_img):
+    def __init__(self, display_key, image_fio, filename: str):
         # Setup main window
         super().__init__()
         self.centralWidget = QWidget(self)
 
+        self.setWindowTitle(filename)
+
         self.lbl_image = QLabel(self)
-        self.lbl_image.setText("New images")
+        self.lbl_image.setText('')
         self.lbl_image.show()
-        self.pixmap = QPixmap(selected_img)
+
+        image_pil = Image.open(image_fio)
+        image_pilqt = ImageQt(image_pil)
+        image_qt = QImage(image_pilqt)
+
+        self.pixmap = QPixmap.fromImage(image_qt)
         self.lbl_image.setPixmap(self.pixmap)
 
         self.verticalLayout = QVBoxLayout(self.centralWidget)

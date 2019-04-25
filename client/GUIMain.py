@@ -19,6 +19,8 @@
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
 
+from client.files import *
+import client.api_calls as api
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QWidget
@@ -32,12 +34,12 @@ from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QMessageBox
 from client.GUIImageTable import GUIImageTable
 from client.GUIShowImage import ImageDisplayer
-# form client.GUIShowImage import GUIShowImage
-import api_calls
-#
+from client.GUIShowImage import GUIShowImage
+from PIL import Image
+
 # def test(a,b,c):
 #     """
-#     :param a: 
+#     :param a:
 #     :param b:
 #     :param c:
 #     :return:
@@ -116,7 +118,8 @@ class GUIMain(QMainWindow):
         self.btn_dload_png.setText("Download PNG")
         self.btn_upload.setText("Upload")
 
-        self.btn_upload.clicked.connect(self.upload_callback)
+        self.btn_upload.clicked.connect(self.btn_upload_callback)
+
         self.btn_display.clicked.connect(self.btn_display_callback)
         self.btn_contrast_invert.clicked.connect(
             self.btn_contrast_invert_callback)
@@ -132,7 +135,7 @@ class GUIMain(QMainWindow):
         self.btn_dload_png.clicked.connect(self.btn_dload_png_callback)
         self.btn_dload_tiff.clicked.connect(self.btn_dload_tiff_callback)
 
-    def upload_callback(self):
+    def btn_upload_callback(self):
 
         # Create File Select Dialog
         dialog = QFileDialog(parent=self, caption='Images')
@@ -141,57 +144,44 @@ class GUIMain(QMainWindow):
 
         if dialog.exec_() == QDialog.Accepted:
             print(dialog.selectedFiles())
-            # Call API upload Files/ multiple?
-        self.api_calls.upload_image()
 
-    def on_receive_image_info(self):
-        self.api_calls.Get_images_info()
-        self.tbl_images.load_data_from_dict(
-            {
-                "1": {
-                    "ID": "1",
-                    "Filename": "mega_image.jpg",
-                    "Format": "jpeg",
-                    "Size": "640x480",
-                    "Description": "Description",
-                    "Timestamp": "Today",
-                }
-            }
-        )
+        # Call API upload Files/ multiple?
 
-    def on_equalize_histogram(self):
-        self.api_calls.equalize_histogram()
-        pass
+        self.update_table()
 
-    def get_table_selection(self):
-        indexes = self.tbl_images.selectionModel().selectedRows()
-        for index in sorted(indexes):
-            print('Row %d is selected' % index.row())
-        return indexes.row()
+    def update_table(self):
+        info_dict = api.get_images_info(self.user_hash)
+        self.tbl_images.load_data_from_dict(info_dict)
 
-    def btn_display_callback(self, ):
-        rows = self.get_table_selection()
-        get_img = self.Get_images_info()
-        self.img_displayer.new_display()
+    def btn_display_callback(self):
+        rows = self.tbl_images.get_selected_rows()
+        ids = []
+        names = []
+        for r in rows:
+            ids.append(self.tbl_images.item(r, 0).text())
+            names.append(self.tbl_images.item(r, 1).text())
+
+        for id, name in zip(ids, names):
+            dout = api.get_single_image(id, self.user_hash)
+            image_fio = b64s_to_fio(dout['data'])
+            self.img_displayer.new_display(image_fio, name)
 
     def btn_compare_callback(self):
         # ensure selected row
         # get image IDs
         # request for image data
         # display selected imgs
-        selected_rows = self.get_table_selection()
+        selected_rows = self.tbl_images.get_selected_rows()
         print(selected_rows)
-        self.img_displayer.new_display()
-        pass
 
     def btn_contrast_invert_callback(self, image_id, image_format, filename):
         # get requests contrast_invert func
-        # if no selection in get_table_selection()->ErrorMessage
-        # input = get_table_selection(self)
+        # if no selection in tbl_images.get_selected_rows()->ErrorMessage
+        # input = tbl_images.get_selected_rows(self)
         # if input==None:
         #     self.warning_box()
-        self.api_calls.contrast_invert(image_id, image_format, filename)
-        pass
+        api.contrast_invert(image_id, image_format, filename)
+        self.update_table()
 
     def btn_display_hist_callback(self):
         # get requests img histogram
@@ -205,33 +195,36 @@ class GUIMain(QMainWindow):
 
     def btn_equalize_hist_callback(self, image_id, image_format, filename):
         # get requests equalize hist image
-        self.api_calls.equalize_histogram(image_id, image_format, filename)
+        api.equalize_histogram(image_id, image_format, filename)
+        self.update_table()
         pass
 
     def btn_contrast_stretch_callback(self, image_id, image_format, filename):
         # get requests contrast stretch
-        self.api_calls.contrast_stretch(image_id, image_format, filename)
+        api.contrast_stretch(image_id, image_format, filename)
+        self.update_table()
         pass
 
     def btn_log_compress_callback(self, image_id, image_format, filename):
         # get requests log compress
-        self.api_calls.log_compress(image_id, image_format, filename)
+        api.log_compress(image_id, image_format, filename)
         self.on_process_done()
+        self.update_table()
         pass
 
     def btn_dload_jpeg_callback(self, image_id, filename, image_format='jpeg'):
         # get requests jpeg img
-        self.api_calls.download_images(image_id, filename, image_format)
+        api.download_images(image_id, filename, image_format)
         pass
 
     def btn_dload_tiff_callback(self, image_id, filename, image_format='tiff'):
         # get requests tiff img
-        self.apicalls.download_images(image_id, filename, image_format)
+        api.download_images(image_id, filename, image_format)
         pass
 
     def btn_dload_png_callback(self, image_id, filename, image_format='png'):
         # get requests png img
-        self.api_calls.download_images(image_id, filename, image_format)
+        api.download_images(image_id, filename, image_format)
         pass
 
     def warning_box(self):
@@ -239,4 +232,3 @@ class GUIMain(QMainWindow):
 
     def on_process_done(self):
         QMessageBox.about(self, 'Process Done', 'Process Done')
-

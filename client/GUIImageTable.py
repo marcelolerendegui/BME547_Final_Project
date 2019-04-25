@@ -50,8 +50,17 @@ class GUIImageTable(QTableWidget):
 
     def load_data_from_dict(self, info):
         for r, (k, v) in enumerate(info.items()):
-            print(r, k, v)
             self.setRowCount(r+1)
-            for c, hn in enumerate(self.header_names):
-                self.setItem(r, c, QTableWidgetItem(v[hn]))
-                print(r, c, hn, v[hn])
+            self.setItem(r, 0, QTableWidgetItem(k))
+            self.setItem(r, 1, QTableWidgetItem(v['filename']))
+            self.setItem(r, 2, QTableWidgetItem(v['img_format']))
+            self.setItem(r, 3, QTableWidgetItem(v['size']))
+            self.setItem(r, 4, QTableWidgetItem(v['description']))
+            self.setItem(r, 5, QTableWidgetItem(v['timestamp']))
+
+    def get_selected_rows(self):
+        indexes = self.selectionModel().selectedRows()
+        rows = []
+        for index in sorted(indexes):
+            rows.append(index.row())
+        return rows

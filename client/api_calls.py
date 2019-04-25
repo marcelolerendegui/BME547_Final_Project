@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
+import json
 import requests
 import base64
 from PIL import Image
@@ -25,10 +26,19 @@ from io import BytesIO
 api_host = "http://127.0.0.1:5000"
 
 
-def Get_images_info(user_hash: str):
+def get_single_image(image_id: str, user_hash: str):
+    d = {
+        'image_ids': [image_id],
+        'format': 'PNG',
+        'user_hash': user_hash
+    }
+    r = requests.get(api_host+"/api/download/", json=d)
+    return json.loads(r.text)
+
+
+def get_images_info(user_hash: str):
     r = requests.get(api_host + '/api/image_info/' + user_hash)
-    return r
-    pass
+    return json.loads(r.text)
 
 
 def upload_image(image_id, filename):

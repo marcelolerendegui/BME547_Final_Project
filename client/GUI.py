@@ -35,6 +35,8 @@ class GUI(QObject):
 
     @pyqtSlot(str)
     def on_login(self, user_hash):
+        user_hash = 'test_user1234'
         self.user_hash = user_hash
+        self.client_gui.user_hash = user_hash
         self.client_gui.show()
         print("login signal received: ", self.user_hash)
