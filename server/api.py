@@ -188,18 +188,102 @@ def get_image_info(user_hash: str):
 
 def edit_image_description(edit_image_description_dict: dict):
     # Verify input types
+    t_ok, t_err = is_type_ok(
+        edit_image_description_dict,
+        """
+        dict{
+            'image_id': str,
+            'description': str,
+            'user_hash': str
+        }
+        """
+    )
+
+    if t_ok is False:
+        return {
+            'sucess':	False,
+            'error_msg': t_err,
+        }
+
+    image_id = edit_image_description_dict['image_id']
+    user_hash = edit_image_description_dict['user_hash']
+
     # Check if image id exists (and fetch it)
+    result, errmsg, image = check_existance_and_fetch_image(
+        image_id,
+        user_hash
+    )
+
+    if result is False:
+        return {
+            'success': False,
+            'error_msg': errmsg,
+        }
+
     # Edit Description
+    image.description = edit_image_description_dict['description']
     # Save image
-    return 'EDIT IMAGE DESCRIPTION'
+    try:
+        image.save()
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not save edited image',
+        }
+    return {
+        'success': True,
+        'error_msg': '',
+    }
 
 
 def edit_image_filename(edit_image_filename_dict: dict):
     # Verify input types
+    t_ok, t_err = is_type_ok(
+        edit_image_filename_dict,
+        """
+        dict{
+            'image_id': str,
+            'filename': str,
+            'user_hash': str
+        }
+        """
+    )
+
+    if t_ok is False:
+        return {
+            'sucess':	False,
+            'error_msg': t_err,
+        }
+
+    image_id = edit_image_filename_dict['image_id']
+    user_hash = edit_image_filename_dict['user_hash']
+
     # Check if image id exists (and fetch it)
-    # Edit filename
+    result, errmsg, image = check_existance_and_fetch_image(
+        image_id,
+        user_hash
+    )
+
+    if result is False:
+        return {
+            'success': False,
+            'error_msg': errmsg,
+        }
+
+    # Edit Description
+    image.filename = edit_image_filename_dict['filename']
     # Save image
-    return 'EDIT IMAGE FILENAME'
+    try:
+        image.save()
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not save edited image',
+        }
+    return {
+        'success': True,
+        'error_msg': '',
+    }
 
 
 def download(download_images_dict: dict):
@@ -361,7 +445,9 @@ def image_process(image_process_dict: dict) -> dict:
             'processing_time': 0.0
         }
 
+    # Start measuring ellapsed time
     start_time = datetime.now()
+
     image_fio = b64s_to_fio(in_image.data)
 
     # Extract size from image data
@@ -392,6 +478,7 @@ def image_process(image_process_dict: dict) -> dict:
             'processing_time': 0.0
         }
 
+    # Stop measuring ellapsed time
     end_time = datetime.now()
     ellapsed_time = end_time-start_time
 
@@ -414,10 +501,6 @@ def check_existance_and_fetch_image(image_id: str, user_hash: str):
     else:
         image = db.get_image(image_id, user_hash)
         if image is not None:
-            return True,
-            '',
-            image
+            return True, '', image
         else:
-            return False,
-            'Error fetching image' + image_id,
-            None
+            return False, 'Error fetching image' + image_id, None
