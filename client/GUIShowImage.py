@@ -70,15 +70,15 @@ class ImageDisplayer(QObject):
 class GUIShowImage(QMainWindow):
     on_close = QtCore.pyqtSignal(int)
 
-    def __init__(self, display_key):
+    def __init__(self, display_key, selected_img):
         # Setup main window
         super().__init__()
         self.centralWidget = QWidget(self)
 
         self.lbl_image = QLabel(self)
-        self.lbl_image.setText("asfafs")
+        self.lbl_image.setText("New images")
         self.lbl_image.show()
-        self.pixmap = QPixmap('image.jpeg')
+        self.pixmap = QPixmap(selected_img)
         self.lbl_image.setPixmap(self.pixmap)
 
         self.verticalLayout = QVBoxLayout(self.centralWidget)
@@ -88,5 +88,5 @@ class GUIShowImage(QMainWindow):
 
         self.dkey = display_key
 
-    def closeEvent(self, evnt):
+    def closeEvent(self, event):
         self.on_close.emit(self.dkey)

@@ -32,7 +32,8 @@ from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QMessageBox
 from client.GUIImageTable import GUIImageTable
 from client.GUIShowImage import ImageDisplayer
-from api_calls import *
+# form client.GUIShowImage import GUIShowImage
+import api_calls
 #
 # def test(a,b,c):
 #     """
@@ -54,7 +55,6 @@ class GUIMain(QMainWindow):
         self.setGeometry(100, 100, 650, 500)
 
         self.img_displayer = ImageDisplayer()
-
         # Table
         self.tbl_images = GUIImageTable(self.centralWidget)
 
@@ -141,10 +141,11 @@ class GUIMain(QMainWindow):
 
         if dialog.exec_() == QDialog.Accepted:
             print(dialog.selectedFiles())
-            # Call API upload Files
+            # Call API upload Files/ multiple?
+        self.api_calls.upload_image()
 
     def on_receive_image_info(self):
-
+        self.api_calls.Get_images_info()
         self.tbl_images.load_data_from_dict(
             {
                 "1": {
@@ -159,14 +160,18 @@ class GUIMain(QMainWindow):
         )
 
     def on_equalize_histogram(self):
+        self.api_calls.equalize_histogram()
         pass
 
     def get_table_selection(self):
         indexes = self.tbl_images.selectionModel().selectedRows()
         for index in sorted(indexes):
             print('Row %d is selected' % index.row())
+        return indexes.row()
 
-    def btn_display_callback(self):
+    def btn_display_callback(self, ):
+        rows = self.get_table_selection()
+        get_img = self.Get_images_info()
         self.img_displayer.new_display()
 
     def btn_compare_callback(self):
@@ -174,18 +179,23 @@ class GUIMain(QMainWindow):
         # get image IDs
         # request for image data
         # display selected imgs
+        selected_rows = self.get_table_selection()
+        print(selected_rows)
+        self.img_displayer.new_display()
         pass
 
-    def btn_contrast_invert_callback(self):
+    def btn_contrast_invert_callback(self, image_id, image_format, filename):
         # get requests contrast_invert func
         # if no selection in get_table_selection()->ErrorMessage
         # input = get_table_selection(self)
         # if input==None:
         #     self.warning_box()
+        self.api_calls.contrast_invert(image_id, image_format, filename)
         pass
 
     def btn_display_hist_callback(self):
         # get requests img histogram
+
         pass
 
     def btn_display_color_hist_callback(self):
@@ -193,30 +203,40 @@ class GUIMain(QMainWindow):
 
         pass
 
-    def btn_equalize_hist_callback(self):
+    def btn_equalize_hist_callback(self, image_id, image_format, filename):
         # get requests equalize hist image
+        self.api_calls.equalize_histogram(image_id, image_format, filename)
         pass
 
-    def btn_contrast_stretch_callback(self):
+    def btn_contrast_stretch_callback(self, image_id, image_format, filename):
         # get requests contrast stretch
+        self.api_calls.contrast_stretch(image_id, image_format, filename)
         pass
 
-    def btn_log_compress_callback(self):
+    def btn_log_compress_callback(self, image_id, image_format, filename):
         # get requests log compress
+        self.api_calls.log_compress(image_id, image_format, filename)
+        self.on_process_done()
         pass
 
-    def btn_dload_jpeg_callback(self):
+    def btn_dload_jpeg_callback(self, image_id, filename, image_format='jpeg'):
         # get requests jpeg img
+        self.api_calls.download_images(image_id, filename, image_format)
         pass
 
-    def btn_dload_tiff_callback(self):
+    def btn_dload_tiff_callback(self, image_id, filename, image_format='tiff'):
         # get requests tiff img
+        self.apicalls.download_images(image_id, filename, image_format)
         pass
 
-    def btn_dload_png_callback(self):
+    def btn_dload_png_callback(self, image_id, filename, image_format='png'):
         # get requests png img
-
+        self.api_calls.download_images(image_id, filename, image_format)
         pass
 
     def warning_box(self):
         QMessageBox.about(self, 'Errormessage', 'No image uploaded')
+
+    def on_process_done(self):
+        QMessageBox.about(self, 'Process Done', 'Process Done')
+

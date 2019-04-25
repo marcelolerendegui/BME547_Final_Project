@@ -25,28 +25,30 @@ from io import BytesIO
 api_host = "http://127.0.0.1:5000"
 
 
-def check_user_password():
-
+def Get_images_info(user_hash: str):
+    r = requests.get(api_host + '/api/image_info/' + user_hash)
+    return r
     pass
 
 
 def upload_image(image_id, filename):
-    image_json = {
+    image_dic = {
         "image_id": image_id,
         "out_image_filename": filename
     }
-    r = requests.post('http://127.0.0.1:5000/api/upload_image',
-                      json=image_json)
+    r = requests.post(api_host + 'api/upload/image',
+                      json=image_dic)
+    return r
     pass
 
 
 def upload_multiple_images(filename, user_hash):
-    image_json = {
+    image_dic = {
         "filename": filename,
         "user_hash": user_hash,
         "data": "The WHOLE zip file converted to a 64base string"
     }
-    r = requests.post(api_host + '/api/upload/zip')
+    r = requests.post(api_host + '/api/upload/zip', json=image_dic)
     return r
 
 
