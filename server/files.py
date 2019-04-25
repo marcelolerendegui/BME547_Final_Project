@@ -61,27 +61,30 @@ def b64s_to_b(b64s: str) -> bytes:
 
 
 def b64s_to_s(b64s: str) -> str:
-    s = base64.b64decode(b64s).decode('utf8')
+    s = base64.b64decode(b64s.encode('utf8')).decode('utf8')
     return s
 
 
 def b64s_to_fio(b64s: str):
-    fio = io.BytesIO(base64.b64decode(b64s))
+    fio = io.BytesIO(base64.b64decode(b64s.encode('utf8')))
     return fio
 
 
 def fio_to_b(fio) -> bytes:
+    fio.seek(0)
     b = fio.read()
     return b
 
 
 def fio_to_s(fio) -> str:
+    fio.seek(0)
     s = fio.read().decode('utf8')
     return s
 
 
 def fio_to_b64s(fio) -> str:
-    b64s = str(base64.b64encode(fio.read()), encoding='utf-8')
+    fio.seek(0)
+    b64s = base64.b64encode(fio.read()).decode('utf8')
     return b64s
 
 
@@ -98,7 +101,7 @@ def files_from_zip(zip_fio):
     with ZipFile(zip_fio, 'r') as f:
         names = f.namelist()
         for name in names:
-            file = zip_fio.open(name, 'rb')
+            file = f.open(name, 'r')
             yield name, b_to_fio(file.read())
 
 

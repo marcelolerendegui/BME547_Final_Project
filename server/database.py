@@ -22,6 +22,7 @@
 from pymodm import connect, MongoModel, fields
 import os
 from server.database_model import Image
+from bson import ObjectId
 
 
 def init():
@@ -31,15 +32,9 @@ def init():
 
     """
 
-    mdb_user = os.environ.get('MONGODB_USER')  # xinyihang1
-    mdb_pass = os.environ.get('MONGODB_PASS')  # 19950301
-    connect(
-        'mongodb+srv: //' +
-        mdb_user +
-        ':' +
-        mdb_pass +
-        '@bme547-q262c.mongodb.net/Database'
-    )
+    mdb_user = 'xinyihang1'  # os.environ.get('MONGODB_USER')
+    mdb_pass = '19950301'  # os.environ.get('MONGODB_PASS')
+
     connection_str = "".join([
         "mongodb+srv://",
         mdb_user,
@@ -113,8 +108,8 @@ def get_image(image_id: str, user_hash: str) -> Image:
     """
 
     try:
-        image = Image.objects.get({'_id': user_id})
-        if image.user_hash is not user_hash:
+        image = Image.objects.raw({'_id': ObjectId(image_id)}).first()
+        if image.user_hash != user_hash:
             image = None
     except:
         image = None
@@ -123,7 +118,7 @@ def get_image(image_id: str, user_hash: str) -> Image:
 
 def get_all_user_images(user_hash: str):
     try:
-        image = Image.objects.get({'user_hash': user_hash})
+        image = Image.objects.raw({'user_hash': user_hash})
     except:
         image = None
     return image

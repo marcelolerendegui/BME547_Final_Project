@@ -117,17 +117,17 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
         return {
             'sucess':	False,
             'error_msg':
-            'image_data cant be identified as a zip file in base64 string format',
+            'data cant be identified as a zip file in base64 string format',
         }
 
     # Process each file inside the zip
-    result = []
-    err = []
+    results = []
+    errs = []
     for name, image_fio in files_from_zip(zip_fio):
         # Verify that the current file is actually an image
         if img_proc.is_image(image_fio) is False:
-            result.append(False)
-            err.append(
+            results.append(False)
+            errs.append(
                 name +
                 'file can not be identified as an image. Ignored \n'
             )
@@ -139,15 +139,15 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
         result = db.add_image(
             filename=name,
             img_format=im_format,
-            description="extracted from" + upload_mult_img_dict['filename'],
+            description="extracted from " + upload_mult_img_dict['filename'],
             size=im_size,
             timestamp=datetime.now(),
             data=fio_to_b64s(image_fio),
             user_hash=user_hash,
         )
         if result is False:
-            result.append(False)
-            err.append(
+            results.append(False)
+            errs.append(
                 'Error adding image' +
                 name +
                 ' to database\n'
@@ -155,8 +155,8 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
 
     # return all the error messages
     return {
-        'sucess':	all(result),
-        'error_msg': '\n'.join(err),
+        'sucess':	all(results),
+        'error_msg': '\n'.join(errs),
     }
 
 
@@ -176,7 +176,7 @@ def get_image_info(user_hash: str):
     out_dict = {}
     if images is not None:
         for img in images:
-            out_dict[img.image_id] = {
+            out_dict[str(img._id)] = {
                 'filename': img.filename,
                 'img_format': img.img_format,
                 'timestamp': img.timestamp,

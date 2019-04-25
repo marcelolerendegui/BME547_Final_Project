@@ -94,8 +94,16 @@ def contrast_invert(image):
     return img_output
 
 
-def format_convert(image, im_format: str):
-    mem_file = io.BytesIO()
-    image.save(mem_file, im_format)
-    mem_file.seek(0)
-    return mem_file.read()
+def format_convert(img_fio, im_format: str):
+    # Create new file IO
+    fio = io.BytesIO()
+
+    # Open img_fio
+    image = Image.open(img_fio)
+
+    # Save with new format to fio
+    image.save(fio, im_format)
+
+    # Rewind and return
+    fio.seek(0)
+    return fio

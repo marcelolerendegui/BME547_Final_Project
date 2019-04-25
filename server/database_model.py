@@ -23,7 +23,6 @@ from pymodm import connect, MongoModel, fields
 
 
 class Image(MongoModel):
-    image_id = fields.CharField(primary_key=True)
     filename = fields.CharField()
     img_format = fields.CharField()
     description = fields.CharField()

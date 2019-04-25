@@ -20,7 +20,10 @@
 # If not, see <https://www.gnu.org/licenses/>.
 
 from server import app
+import server.database as db
 import logging
+
+db.init()
 
 logging.basicConfig(filename='server.log', level=logging.INFO)
 logging.info('Image Processing Server Started')
