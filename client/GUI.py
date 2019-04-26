@@ -21,8 +21,8 @@
 
 from client.GUIMain import GUIMain
 from client.GUILoginDialog import GUILoginDialog
-from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtCore import QObject
+from PyQt5.QtCore import pyqtSlot
 
 
 class GUI(QObject):
@@ -31,12 +31,11 @@ class GUI(QObject):
         self.dlg_login = GUILoginDialog()
         self.dlg_login.login.connect(self.on_login)
         self.dlg_login.show()
-        self.client_gui = GUIMain()
 
     @pyqtSlot(str)
     def on_login(self, user_hash):
-        user_hash = 'willy'
         self.user_hash = user_hash
+        self.client_gui = GUIMain()
         self.client_gui.user_hash = user_hash
         self.client_gui.show()
-        print("login signal received: ", self.user_hash)
+        self.client_gui.update_table()

@@ -64,3 +64,38 @@ class GUIImageTable(QTableWidget):
         for index in sorted(indexes):
             rows.append(index.row())
         return rows
+
+    def get_selected_ids(self):
+        rows = self.get_selected_rows()
+        ids = []
+        for r in rows:
+            ids.append(self.item(r, 0).text())
+        return ids
+
+    def get_selected_names(self):
+        rows = self.get_selected_rows()
+        names = []
+        for r in rows:
+            names.append(self.item(r, 1).text())
+        return names
+
+    def get_mrs_rows(self, n: int):
+        indexes = self.selectionModel().selectedRows()
+        rows = []
+        for index in indexes:
+            rows.append(index.row())
+        return rows[-n::]
+
+    def get_mrs_ids(self, n: int):
+        rows = self.get_mrs_rows(n)
+        ids = []
+        for r in rows:
+            ids.append(self.item(r, 0).text())
+        return ids
+
+    def get_mrs_names(self, n: int):
+        rows = self.get_mrs_rows(n)
+        names = []
+        for r in rows:
+            names.append(self.item(r, 1).text())
+        return names

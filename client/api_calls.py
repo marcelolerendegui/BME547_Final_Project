@@ -26,6 +26,24 @@ from io import BytesIO
 api_host = "http://127.0.0.1:5000"
 
 
+def apply_algorithm(
+    image_id: str,
+    algorithm: str,
+    im_format: str,
+    out_filename: str,
+    user_hash: str
+):
+    d = {
+        'image_id': image_id,
+        'algorithm': algorithm,
+        'out_image_format': im_format,
+        'out_image_filename': out_filename,
+        'user_hash': user_hash,
+    }
+    r = requests.post(api_host+"/api/image_process", json=d)
+    return json.loads(r.text)
+
+
 def get_download_images(image_ids: str, im_format: str, user_hash: str):
     d = {
         'image_ids': image_ids,

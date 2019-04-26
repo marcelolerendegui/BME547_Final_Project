@@ -10,7 +10,7 @@ setup(
     url='https://github.com/marcelolerendegui/BME547_Final_Project',
     include_package_data=True,
     install_requires=[
-        'Validation',
+        'flask',
     ],
 )
 
@@ -24,9 +24,6 @@ setup(
     url='https://github.com/marcelolerendegui/BME547_Final_Project',
     include_package_data=True,
     install_requires=[
-        'flask',
         'requests',
-        'ImgProc.Core',
-        'Validation',
     ],
 )

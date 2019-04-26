@@ -36,15 +36,7 @@ from client.GUIImageTable import GUIImageTable
 from client.GUIShowImage import ImageDisplayer
 from client.GUIShowImage import GUIShowImage
 from PIL import Image
-
-# def test(a,b,c):
-#     """
-#     :param a:
-#     :param b:
-#     :param c:
-#     :return:
-#     """
-#     pass
+import matplotlib.pyplot as plt
 
 
 class GUIMain(QMainWindow):
@@ -136,7 +128,6 @@ class GUIMain(QMainWindow):
         self.btn_dload_tiff.clicked.connect(self.download_images_tiff)
 
     def btn_upload_callback(self):
-
         # Create File Select Dialog
         dialog = QFileDialog(parent=self, caption='Images')
         dialog.setMimeTypeFilters(
@@ -150,20 +141,20 @@ class GUIMain(QMainWindow):
             with open(filename, 'rb') as f:
                 file_b64s = fio_to_b64s(f)
 
-                if ext_from_path(filename) == '.zip':
-                    ret = api.upload_zip(
-                        file_b64s,
-                        nameext_from_path(filename),
-                        self.user_hash
-                    )
-                    print(ret)
-                else:
-                    ret = api.upload_image(
-                        file_b64s,
-                        nameext_from_path(filename),
-                        self.user_hash
-                    )
-
+            if ext_from_path(filename) == '.zip':
+                ret = api.upload_zip(
+                    file_b64s,
+                    nameext_from_path(filename),
+                    self.user_hash
+                )
+            else:
+                ret = api.upload_image(
+                    file_b64s,
+                    nameext_from_path(filename),
+                    self.user_hash
+                )
+            if ret['success'] is False:
+                self.show_error(ret['error_msg'])
         self.update_table()
 
     def update_table(self):
@@ -171,81 +162,91 @@ class GUIMain(QMainWindow):
         self.tbl_images.load_data_from_dict(info_dict)
 
     def btn_display_callback(self):
+        ids = self.tbl_images.get_selected_ids()
+        names = self.tbl_images.get_selected_names()
+        for id, name in zip(ids, names):
+            ret = api.get_single_image(id, self.user_hash)
+            if ret['success'] is False:
+                self.show_error(ret['error_msg'])
+            else:
+                image_fio = b64s_to_fio(ret['data'])
+                self.img_displayer.new_display(image_fio, name)
+
+    def btn_compare_callback(self):
+        mrs2_ids = self.tbl_images.get_mrs_ids(2)
+        mrs2_names = self.tbl_images.get_mrs_names(2)
+
+        for id, name in zip(mrs2_ids, mrs2_names):
+            ret = api.get_single_image(id, self.user_hash)
+            if ret['success'] is False:
+                self.show_error(ret['error_msg'])
+            else:
+                image_fio = b64s_to_fio(ret['data'])
+                self.img_displayer.new_display(image_fio, name)
+
+    def btn_display_hist_callback(self):
+        ids = self.tbl_images.get_selected_ids()
+        names = self.tbl_images.get_selected_names()
+
+        for id, name in zip(ids, names):
+            ret = api.get_single_image(id, self.user_hash)
+            if ret['success'] is False:
+                self.show_error(ret['error_msg'])
+            else:
+                image_fio = b64s_to_fio(ret['data'])
+                img_hist_fio = fio_hist_fio(image_fio)
+                self.img_displayer.new_display(
+                    img_hist_fio, name + ' Histogram')
+                del image_fio
+                del img_hist_fio
+
+    def btn_display_color_hist_callback(self):
+        ids = self.tbl_images.get_selected_ids()
+        names = self.tbl_images.get_selected_names()
+
+        for id, name in zip(ids, names):
+            ret = api.get_single_image(id, self.user_hash)
+            if ret['success'] is False:
+                self.show_error(ret['error_msg'])
+            else:
+                image_fio = b64s_to_fio(ret['data'])
+                img_hist_fio = fio_color_hist_fio(image_fio)
+                self.img_displayer.new_display(
+                    img_hist_fio, name + ' Histogram')
+
+    def btn_contrast_invert_callback(self):
+        self.image_proc_selected('Contrast Invert')
+
+    def image_proc_selected(self, algorithm: str):
         rows = self.tbl_images.get_selected_rows()
         ids = []
         names = []
         for r in rows:
             ids.append(self.tbl_images.item(r, 0).text())
             names.append(self.tbl_images.item(r, 1).text())
-
         for id, name in zip(ids, names):
-            dout = api.get_single_image(id, self.user_hash)
-            image_fio = b64s_to_fio(dout['data'])
-            self.img_displayer.new_display(image_fio, name)
-
-    def btn_compare_callback(self):
-        # ensure selected row
-        # get image IDs
-        # request for image data
-        # display selected imgs
-        selected_rows = self.tbl_images.get_selected_rows()
-        print(selected_rows)
-
-    def btn_contrast_invert_callback(self, image_id, image_format, filename):
-        # get requests contrast_invert func
-        # if no selection in tbl_images.get_selected_rows()->ErrorMessage
-        # input = tbl_images.get_selected_rows(self)
-        # if input==None:
-        #     self.warning_box()
-        api.contrast_invert(image_id, image_format, filename)
+            ret = api.apply_algorithm(
+                id,
+                algorithm,
+                'JPEG',
+                name,
+                self.user_hash
+            )
+            if ret['success'] is False:
+                self.show_error(ret['error_msg'])
         self.update_table()
 
-    def btn_display_hist_callback(self):
-        # get requests img histogram
+    def btn_equalize_hist_callback(self):
+        self.image_proc_selected('Histogram Equalization')
 
-        pass
+    def btn_contrast_stretch_callback(self):
+        self.image_proc_selected('Contrast Stretching')
 
-    def btn_display_color_hist_callback(self):
-        # get requests color_histogram image
+    def btn_log_compress_callback(self):
+        self.image_proc_selected('Log Compression')
 
-        pass
-
-    def btn_equalize_hist_callback(self, image_id, image_format, filename):
-        # get requests equalize hist image
-        api.equalize_histogram(image_id, image_format, filename)
-        self.update_table()
-        pass
-
-    def btn_contrast_stretch_callback(self, image_id, image_format, filename):
-        # get requests contrast stretch
-        api.contrast_stretch(image_id, image_format, filename)
-        self.update_table()
-        pass
-
-    def btn_log_compress_callback(self, image_id, image_format, filename):
-        # get requests log compress
-        api.log_compress(image_id, image_format, filename)
-        self.on_process_done()
-        self.update_table()
-        pass
-
-    def btn_dload_jpeg_callback(self, image_id, filename, image_format='jpeg'):
-        # get requests jpeg img
-        api.download_images(image_id, filename, image_format)
-        pass
-
-    def btn_dload_tiff_callback(self, image_id, filename, image_format='tiff'):
-        # get requests tiff img
-        api.download_images(image_id, filename, image_format)
-        pass
-
-    def btn_dload_png_callback(self, image_id, filename, image_format='png'):
-        # get requests png img
-        api.download_images(image_id, filename, image_format)
-        pass
-
-    def warning_box(self):
-        QMessageBox.about(self, 'Errormessage', 'No image uploaded')
+    def show_error(self, message: str):
+        QMessageBox.about(self, 'Errormessage', message)
 
     def on_process_done(self):
         QMessageBox.about(self, 'Process Done', 'Process Done')
@@ -277,10 +278,13 @@ class GUIMain(QMainWindow):
 
             if dialog.exec_() == QDialog.Accepted:
                 filename = dialog.selectedFiles()[0]
-                dout = api.get_download_images(ids, im_format, self.user_hash)
-                image_b = b64s_to_b(dout['data'])
-                with open(filename, 'wb+') as f:
-                    f.write(image_b)
+                ret = api.get_download_images(ids, im_format, self.user_hash)
+                if ret['success'] is False:
+                    self.show_error(ret['error_msg'])
+                else:
+                    image_b = b64s_to_b(ret['data'])
+                    with open(filename, 'wb+') as f:
+                        f.write(image_b)
 
         elif len(ids) >= 1:
 
@@ -291,9 +295,47 @@ class GUIMain(QMainWindow):
 
             if dialog.exec_() == QDialog.Accepted:
                 filename = dialog.selectedFiles()[0]
-                dout = api.get_download_images(ids, im_format, self.user_hash)
-                image_b = b64s_to_b(dout['data'])
-                with open(filename, 'wb+') as f:
-                    f.write(image_b)
+                ret = api.get_download_images(ids, im_format, self.user_hash)
+                if ret['success'] is False:
+                    self.show_error(ret['error_msg'])
+                else:
+                    image_b = b64s_to_b(ret['data'])
+                    with open(filename, 'wb+') as f:
+                        f.write(image_b)
         else:
             return
+
+
+def fio_color_hist_fio(image_fio):
+
+    img_pil = Image.open(image_fio)
+    r, g, b = img_pil.split()
+
+    bins = list(range(256))
+    plt.plot(bins, r.histogram(), 'r')
+    plt.plot(bins, g.histogram(), 'g')
+    plt.plot(bins, b.histogram(), 'b')
+    plt.xlabel('Pixel value')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    out_img_fio = io.BytesIO()
+    plt.savefig(out_img_fio)
+    plt.close()
+    out_img_fio.seek(0)
+    return out_img_fio
+
+
+def fio_hist_fio(image_fio):
+    img_pil = Image.open(image_fio).convert('L')
+
+    bins = list(range(256))
+    plt.plot(bins, img_pil.histogram(), 'k')
+    plt.xlabel('Pixel value')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    out_img_fio = io.BytesIO()
+    plt.savefig(out_img_fio)
+    out_img_fio.seek(0)
+    image_fio.seek(0)
+    plt.close()
+    return out_img_fio

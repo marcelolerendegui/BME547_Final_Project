@@ -57,8 +57,12 @@ class ImageDisplayer(QObject):
                 new_index = max_index + 1
         else:
             new_index = 1
+
         self.img_displays[new_index] = GUIShowImage(
-            new_index, image_fio, filename)
+            new_index,
+            image_fio,
+            filename
+        )
         self.img_displays[new_index].show()
         self.img_displays[new_index].on_close.connect(
             self.delete_display
@@ -76,6 +80,7 @@ class GUIShowImage(QMainWindow):
         # Setup main window
         super().__init__()
         self.centralWidget = QWidget(self)
+        self.dkey = display_key
 
         self.setWindowTitle(filename)
 
@@ -83,19 +88,16 @@ class GUIShowImage(QMainWindow):
         self.lbl_image.setText('')
         self.lbl_image.show()
 
-        image_pil = Image.open(image_fio)
-        image_pilqt = ImageQt(image_pil)
-        image_qt = QImage(image_pilqt)
+        self.image_pil = Image.open(image_fio)
+        self.image_pilqt = ImageQt(self.image_pil)
+        self.image_qt = QImage(self.image_pilqt)
 
-        self.pixmap = QPixmap.fromImage(image_qt)
+        self.pixmap = QPixmap.fromImage(self.image_qt)
         self.lbl_image.setPixmap(self.pixmap)
-
         self.verticalLayout = QVBoxLayout(self.centralWidget)
         self.verticalLayout.addWidget(self.lbl_image)
 
         self.setCentralWidget(self.centralWidget)
-
-        self.dkey = display_key
 
     def closeEvent(self, event):
         self.on_close.emit(self.dkey)
