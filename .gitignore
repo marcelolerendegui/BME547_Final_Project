@@ -3,4 +3,10 @@ __pycache__/
 doc/
 env_vars.env
 venv/
+env/
+*.zip
+*.jpg
+*.png
+*.tiff
+*.log
 .data/
