@@ -3,6 +3,8 @@ python:
       - "3.6"
 cache:
       - pip
+    directories:
+      - $HOME/.cache/wheels
 before_install:
       - "pip install -U pip"
       - "python setup.py install"

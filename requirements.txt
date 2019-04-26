@@ -1,7 +1,2 @@
 pytest
 pytest-pep8
-numpy
-pymodm
-requests
-scikit-image
-PyQt5

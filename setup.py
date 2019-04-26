@@ -19,6 +19,9 @@ setup(
     include_package_data=True,
     install_requires=[
         'flask',
+        'scikit-image',
+        'pymodm',
+        'numpy',
     ],
 )
 
@@ -41,5 +44,9 @@ setup(
     include_package_data=True,
     install_requires=[
         'requests',
+        'PyQt5',
+        'scikit-image',
+        'numpy',
+
     ],
 )
