@@ -47,6 +47,5 @@ setup(
         'PyQt5',
         'scikit-image',
         'numpy',
-
     ],
 )

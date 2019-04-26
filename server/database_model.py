@@ -23,4 +23,10 @@ from pymodm import connect, MongoModel, fields
 
 
 class Image(MongoModel):
-    image_id = fields.CharField(verbose_name="id")
+    filename = fields.CharField()
+    img_format = fields.CharField()
+    description = fields.CharField()
+    size = fields.ListField()
+    timestamp = fields.DateTimeField()
+    data = fields.CharField()
+    user_hash = fields.CharField()
