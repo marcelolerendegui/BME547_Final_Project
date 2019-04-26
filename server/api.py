@@ -47,7 +47,7 @@ def upload_image(upload_img_dict: dict) -> dict:
 
     if t_ok is False:
         return {
-            'sucess':	False,
+            'success':	False,
             'error_msg': t_err,
         }
 
@@ -57,17 +57,17 @@ def upload_image(upload_img_dict: dict) -> dict:
     # Verify that the received data is actually an image
     if img_proc.is_image(image_fio) is False:
         return {
-            'sucess':	False,
+            'success':	False,
             'error_msg':
             'image_data cant be identified as an base64 formatted image file',
         }
     # Extract size and format from image data
     im_size = img_proc.get_image_size(image_fio)
     im_format = img_proc.get_image_format(image_fio)
-
+    im_filename = name_from_path(upload_img_dict['filename'])
     # Store the new image in the database
     result = db.add_image(
-        filename=upload_img_dict['filename'],
+        filename=im_filename,
         img_format=im_format,
         description=upload_img_dict['description'],
         size=im_size,
@@ -78,12 +78,12 @@ def upload_image(upload_img_dict: dict) -> dict:
 
     if result is True:
         return {
-            'sucess':	True,
+            'success':	True,
             'error_msg': '',
         }
     else:
         return {
-            'sucess': False,
+            'success': False,
             'error_msg': 'Error adding image to database',
         }
 
@@ -104,7 +104,7 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
 
     if t_ok is False:
         return {
-            'sucess':	False,
+            'success':	False,
             'error_msg': t_err,
         }
 
@@ -115,7 +115,7 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
     # Verify that the received data is actually a zip file
     if is_zip(zip_fio) is False:
         return {
-            'sucess':	False,
+            'success':	False,
             'error_msg':
             'data cant be identified as a zip file in base64 string format',
         }
@@ -135,9 +135,10 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
         # Extract size and format from image data
         im_size = img_proc.get_image_size(image_fio)
         im_format = img_proc.get_image_format(image_fio)
+        im_filename = name_from_path(name)
         # Store the new image in the database
         result = db.add_image(
-            filename=name,
+            filename=im_filename,
             img_format=im_format,
             description="extracted from " + upload_mult_img_dict['filename'],
             size=im_size,
@@ -155,7 +156,7 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
 
     # return all the error messages
     return {
-        'sucess':	all(results),
+        'success':	all(results),
         'error_msg': '\n'.join(errs),
     }
 
@@ -168,7 +169,7 @@ def get_image_info(user_hash: str):
     )
     if t_ok is False:
         return {
-            'sucess':	False,
+            'success':	False,
             'error_msg': t_err,
         }
 
@@ -201,7 +202,7 @@ def edit_image_description(edit_image_description_dict: dict):
 
     if t_ok is False:
         return {
-            'sucess':	False,
+            'success':	False,
             'error_msg': t_err,
         }
 
@@ -251,7 +252,7 @@ def edit_image_filename(edit_image_filename_dict: dict):
 
     if t_ok is False:
         return {
-            'sucess':	False,
+            'success':	False,
             'error_msg': t_err,
         }
 
@@ -300,7 +301,7 @@ def download(download_images_dict: dict):
     )
     if t_ok is False:
         return {
-            'sucess':	False,
+            'success':	False,
             'error_msg': t_err,
         }
 
@@ -387,7 +388,12 @@ def download_multiple_images(
         # Save data to generate zip file
         success.append(True)
         datas.append(image_b64s)
-        names.append(image.filename)
+        out_name = get_unique_filename(
+            names,
+            image.filename,
+            image_format.lower()
+        )
+        names.append(out_name)
 
     # Create zip file using the saved names and data
     zip_fio = create_zip_fio(names, datas)
@@ -398,6 +404,20 @@ def download_multiple_images(
         'error_msg': '\n'.join(error_msg),
         'data': fio_to_b64s(zip_fio),
     }
+
+
+def get_unique_filename(names, name, ext):
+
+    out_name = '.'.join([name, ext])
+
+    if out_name not in names:
+        return out_name
+    i = 1
+    out_name = '.'.join([name + str(i), ext])
+    while out_name in names:
+        i += 1
+        out_name = '.'.join([name + str(i), ext])
+    return out_name
 
 
 def image_process(image_process_dict: dict) -> dict:
@@ -416,7 +436,7 @@ def image_process(image_process_dict: dict) -> dict:
     )
     if t_ok is False:
         return {
-            'sucess':	False,
+            'success':	False,
             'error_msg': t_err,
         }
 
