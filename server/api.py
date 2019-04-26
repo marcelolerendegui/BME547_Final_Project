@@ -21,10 +21,11 @@
 
 from flask import Flask, jsonify, request
 from datetime import datetime
-from server.files import *
-from server.verification import is_type_ok
+from core.files import *
+from core.verification import is_type_ok
+import core.img_proc_core as img_proc
 import server.database as db
-import server.img_proc_core as img_proc
+
 
 import logging
 logger = logging.getLogger(__name__)

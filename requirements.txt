@@ -2,6 +2,7 @@ pytest
 pytest-pep8
 flask
 pyQt5
+PyQt5-sip
 scikit-image
 numpy
 requests
