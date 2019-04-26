@@ -1,2 +1,9 @@
 pytest
 pytest-pep8
+flask
+pyQt5
+scikit-image
+numpy
+requests
+pymodm
+dnspython
