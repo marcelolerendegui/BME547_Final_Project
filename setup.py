@@ -5,8 +5,16 @@ setup(
     packages=['server'],
     version='1.0.0',
     description='Image Processing Server',
-    author='Marcelo Lerendegui, WeiHsien Lee, Yihang Xin',
-    author_email='marcelo@lerendegui.com, weihsien.lee@duke.edu, yihang.xin@duke.edu',
+    author=','.join([
+        'Marcelo Lerendegui',
+        'WeiHsien Lee',
+        'Yihang Xin',
+    ]),
+    author_email=','.join([
+        'marcelo@lerendegui.com',
+        'weihsien.lee@duke.edu',
+        'yihang.xin@duke.edu'
+    ]),
     url='https://github.com/marcelolerendegui/BME547_Final_Project',
     include_package_data=True,
     install_requires=[
@@ -19,8 +27,16 @@ setup(
     packages=['client'],
     version='1.0.0',
     description='Image Processing Client',
-    author='Marcelo Lerendegui, WeiHsien Lee, Yihang Xin',
-    author_email='marcelo@lerendegui.com, weihsien.lee@duke.edu, yihang.xin@duke.edu',
+    author=','.join([
+        'Marcelo Lerendegui',
+        'WeiHsien Lee',
+        'Yihang Xin',
+    ]),
+    author_email=','.join([
+        'marcelo@lerendegui.com',
+        'weihsien.lee@duke.edu',
+        'yihang.xin@duke.edu'
+    ]),
     url='https://github.com/marcelolerendegui/BME547_Final_Project',
     include_package_data=True,
     install_requires=[
