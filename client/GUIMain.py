@@ -19,7 +19,7 @@
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
 
-from client.files import *
+from core.files import *
 import client.api_calls as api
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QMainWindow
