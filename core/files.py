@@ -211,7 +211,7 @@ def files_from_zip(zip_fio: fileIO):
 
     This function returns a generator that yields:
         filename, fileIO
-    for each file inside the input zip in fileIO 
+    for each file inside the input zip in fileIO
 
     :param zip_fio: zip fileIO
     :type zip_fio: fileIO
