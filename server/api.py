@@ -202,26 +202,29 @@ def get_image_info(user_hash: str) -> dict:
     ['filename', 'img_format', 'timestamp', 'size', 'description']
     from all the images that belong the the user.
 
-    TODO: Add this function to the client and protocol
-
     :param user_hash: hash that identifies a user
     :type user_hash: str
     :return: dictionary with success(bool), error_msg(str)
         or the images information
     :rtype: dict
     """
+
     # Verify input types
     t_ok, t_err = is_type_ok(
         user_hash,
         "str"
     )
+
     if t_ok is False:
         return {
             'success':	False,
             'error_msg': t_err,
         }
 
+    # fetch all images for the user
     images = db.get_all_user_images(user_hash)
+
+    # create a dictionary with all the image info
     out_dict = {}
     if images is not None:
         for img in images:
@@ -232,6 +235,8 @@ def get_image_info(user_hash: str) -> dict:
                 'size': img.size,
                 'description': img.description,
             }
+
+    # return the info
     return out_dict
 
 
