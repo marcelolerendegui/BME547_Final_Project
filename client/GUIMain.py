@@ -37,6 +37,7 @@ from client.GUIShowImage import ImageDisplayer
 from client.GUIShowImage import GUIShowImage
 import core.img_proc_core as im_proc_doc
 
+
 class GUIMain(QMainWindow):
 
     def __init__(self):
