@@ -257,6 +257,13 @@ def nameext_from_path(path: str) -> str:
 
 
 def ext_from_path(path: str) -> str:
+    """extract extension from path
+    
+    :param path: full path to analyze
+    :type path: str
+    :return: extension: '.ext'
+    :rtype: str
+    """
     ext = os.path.splitext(path)[-1]
     return ext
 
