@@ -245,6 +245,13 @@ def is_zip(zip_fio: fileIO) -> bool:
 
 
 def nameext_from_path(path: str) -> str:
+    """extract name and extension from path
+    
+    :param path: full path to analyze
+    :type path: str
+    :return: name and extension: 'name.ext'
+    :rtype: str
+    """
     nameext = os.path.split(path)[-1]
     return nameext
 
