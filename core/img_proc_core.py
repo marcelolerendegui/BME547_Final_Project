@@ -143,7 +143,11 @@ def histogram_equalization(img_fio: fileIO) -> fileIO:
     return out_fio
 
 
-def contrast_stretch(img_fio: fileIO, lower_perc: int, higher_perc: int) -> fileIO:
+def contrast_stretch(
+    img_fio: fileIO,
+    lower_perc: int,
+    higher_perc: int
+) -> fileIO:
     """ transform image using contrast stretch
 
     :param img_fio: file IO of an image to transform
