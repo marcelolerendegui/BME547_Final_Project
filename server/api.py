@@ -358,7 +358,7 @@ def edit_image_filename(edit_image_filename_dict: dict) -> dict:
 
     # Edit Description
     image.filename = edit_image_filename_dict['filename']
-    
+
     # Save image
     try:
         image.save()
@@ -388,6 +388,7 @@ def download(download_images_dict: dict) -> dict:
         success(bool), error_msg(str)
     :rtype: dict
     """
+
     # Verify input types
     t_ok, t_err = is_type_ok(
         download_images_dict,
@@ -399,12 +400,14 @@ def download(download_images_dict: dict) -> dict:
         }
         """
     )
+
     if t_ok is False:
         return {
             'success':	False,
             'error_msg': t_err,
         }
 
+    # Extract image id, format and user hash from input data
     img_ids = download_images_dict['image_ids']
     img_format = download_images_dict['format']
     user_hash = download_images_dict['user_hash']
