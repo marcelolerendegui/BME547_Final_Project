@@ -71,10 +71,12 @@ def upload_image(upload_img_dict: dict) -> dict:
             'error_msg':
             'image_data cant be identified as an base64 formatted image file',
         }
+        
     # Extract size and format from image data
     im_size = img_proc.get_image_size(image_fio)
     im_format = img_proc.get_image_format(image_fio)
     im_filename = name_from_path(upload_img_dict['filename'])
+
     # Store the new image in the database
     result = db.add_image(
         filename=im_filename,
@@ -86,16 +88,18 @@ def upload_image(upload_img_dict: dict) -> dict:
         user_hash=upload_img_dict['user_hash'],
     )
 
-    if result is True:
-        return {
-            'success':	True,
-            'error_msg': '',
-        }
-    else:
+    if result is False:
         return {
             'success': False,
             'error_msg': 'Error adding image to database',
         }
+
+    # If everything went well
+    return {
+        'success':	True,
+        'error_msg': '',
+    }
+
 
 
 def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
