@@ -42,6 +42,7 @@ def upload_image(upload_img_dict: dict) -> dict:
     :return: dictionary with success(bool), error_msg(str)
     :rtype: dict
     """
+
     # Verify input types
     t_ok, t_err = is_type_ok(
         upload_img_dict,
@@ -71,7 +72,7 @@ def upload_image(upload_img_dict: dict) -> dict:
             'error_msg':
             'image_data cant be identified as an base64 formatted image file',
         }
-        
+
     # Extract size and format from image data
     im_size = img_proc.get_image_size(image_fio)
     im_format = img_proc.get_image_format(image_fio)
@@ -114,6 +115,7 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
     :return: dictionary with success(bool), error_msg(str)
     :rtype: dict
     """
+
     # Verify input types
     t_ok, t_err = is_type_ok(
         upload_mult_img_dict,
@@ -132,8 +134,10 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
             'error_msg': t_err,
         }
 
+    # Extract user hash from input data
     user_hash = upload_mult_img_dict['user_hash']
 
+    # Create zip file IO
     zip_fio = b64s_to_fio(upload_mult_img_dict['data'])
 
     # Verify that the received data is actually a zip file
@@ -147,7 +151,9 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
     # Process each file inside the zip
     results = []
     errs = []
+
     for name, image_fio in files_from_zip(zip_fio):
+
         # Verify that the current file is actually an image
         if img_proc.is_image(image_fio) is False:
             results.append(False)
@@ -156,10 +162,12 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
                 'file can not be identified as an image. Ignored \n'
             )
             continue
+
         # Extract size and format from image data
         im_size = img_proc.get_image_size(image_fio)
         im_format = img_proc.get_image_format(image_fio)
         im_filename = name_from_path(name)
+
         # Store the new image in the database
         result = db.add_image(
             filename=im_filename,
@@ -170,6 +178,7 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
             data=fio_to_b64s(image_fio),
             user_hash=user_hash,
         )
+
         if result is False:
             results.append(False)
             errs.append(
@@ -177,6 +186,7 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
                 name +
                 ' to database\n'
             )
+            continue
 
     # return all the error messages
     return {
