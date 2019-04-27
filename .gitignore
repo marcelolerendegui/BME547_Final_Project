@@ -10,3 +10,6 @@ env/
 *.tiff
 *.log
 .data/
+*.egg-info
+dist
+build

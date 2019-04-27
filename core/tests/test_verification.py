@@ -15,7 +15,7 @@ import pytest
     ]
 )
 def test_is_int(val, expected):
-    from server.verification import is_int
+    from core.verification import is_int
     assert is_int(val) == expected
 
 
@@ -39,7 +39,7 @@ def test_is_int(val, expected):
     ]
 )
 def test_is_float(val, expected):
-    from server.verification import is_float
+    from core.verification import is_float
     assert is_float(val) == expected
 
 
@@ -84,7 +84,7 @@ def test_is_float(val, expected):
     ]
 )
 def test_split_high_level(s, c, open_chars, close_chars, splits):
-    from server.verification import split_high_level
+    from core.verification import split_high_level
     lst = split_high_level(s, c, open_chars, close_chars)
     for l, s in zip(lst, splits):
         assert l == s
@@ -102,7 +102,7 @@ def test_split_high_level(s, c, open_chars, close_chars, splits):
     ]
 )
 def test_split_first_identifier(s, exp1, exp2):
-    from server.verification import split_first_identifier
+    from core.verification import split_first_identifier
     t1, t2 = split_first_identifier(s)
     assert t1 == exp1 and t2 == exp2
 
@@ -147,7 +147,7 @@ def test_split_first_identifier(s, exp1, exp2):
     ]
 )
 def test_str2key(s, key):
-    from server.verification import str2key
+    from core.verification import str2key
     assert str2key(s) == key
 
 
@@ -177,7 +177,7 @@ def test_str2key(s, key):
     ]
 )
 def test_separate_list_types(s, splits):
-    from server.verification import separate_list_types
+    from core.verification import separate_list_types
     lst = separate_list_types(s)
     for l, s in zip(lst, splits):
         assert l == s
@@ -209,7 +209,7 @@ def test_separate_list_types(s, splits):
     ]
 )
 def test_separate_keys(s, ekeys, etypes):
-    from server.verification import separate_keys
+    from core.verification import separate_keys
     keys, types = separate_keys(s)
     for k, ek in zip(keys, ekeys):
         assert k == ek
@@ -251,7 +251,7 @@ def test_separate_keys(s, ekeys, etypes):
     ]
 )
 def test_get_subblock(s, open_c, close_c, eout, eexc):
-    from server.verification import get_subblock
+    from core.verification import get_subblock
 
     if eexc:
         with pytest.raises(Exception):
@@ -275,7 +275,7 @@ def test_get_subblock(s, open_c, close_c, eout, eexc):
     ]
 )
 def test_check_type(t, v, eexc):
-    from server.verification import check_type
+    from core.verification import check_type
     if eexc:
         with pytest.raises(Exception):
             check_type(v, t)
@@ -295,7 +295,7 @@ def test_check_type(t, v, eexc):
     ]
 )
 def test_check_complete_keys(keys, dict, eexc):
-    from server.verification import check_complete_keys
+    from core.verification import check_complete_keys
     if eexc:
         with pytest.raises(Exception):
             check_complete_keys(keys, dict)
@@ -384,7 +384,7 @@ def test_check_complete_keys(keys, dict, eexc):
     ]
 )
 def test_type_gen(s, etypes, eexc):
-    from server.verification import type_gen
+    from core.verification import type_gen
     if eexc:
         with pytest.raises(Exception):
             for t, et in zip(type_gen(s), etypes):
@@ -707,7 +707,7 @@ class My_class_D(dict):
     ]
 )
 def test_verify(str_type, var, must_raise):
-    from server.verification import verify
+    from core.verification import verify
 
     if must_raise:
         with pytest.raises(Exception):
@@ -727,6 +727,6 @@ def test_verify(str_type, var, must_raise):
     ]
 )
 def test_is_type_ok(str_type, var, expected):
-    from server.verification import is_type_ok
+    from core.verification import is_type_ok
     valid, errorstr = is_type_ok(var, str_type)
     assert valid == expected
