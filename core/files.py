@@ -231,7 +231,7 @@ def files_from_zip(zip_fio: fileIO):
 
 def is_zip(zip_fio: fileIO) -> bool:
     """check if fileIO is a zip
-    
+
     :param zip_fio: fileIO to check
     :type zip_fio: fileIO
     :return: True if input fileIO is a zip, False othersise
@@ -246,7 +246,7 @@ def is_zip(zip_fio: fileIO) -> bool:
 
 def nameext_from_path(path: str) -> str:
     """extract name and extension from path
-    
+
     :param path: full path to analyze
     :type path: str
     :return: name and extension: 'name.ext'
@@ -258,7 +258,7 @@ def nameext_from_path(path: str) -> str:
 
 def ext_from_path(path: str) -> str:
     """extract extension from path
-    
+
     :param path: full path to analyze
     :type path: str
     :return: extension: '.ext'
@@ -270,7 +270,7 @@ def ext_from_path(path: str) -> str:
 
 def name_from_path(path: str) -> str:
     """extract file name from path
-    
+
     :param path: full path to analyze
     :type path: str
     :return: file name: 'name'
