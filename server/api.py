@@ -102,7 +102,6 @@ def upload_image(upload_img_dict: dict) -> dict:
     }
 
 
-
 def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
     """ upload multiple images as a zip file
 
@@ -584,7 +583,7 @@ def image_process(image_process_dict: dict) -> dict:
     image with a new image filename,
 
 
-    :param image_process_dict: dictionary with all the 
+    :param image_process_dict: dictionary with all the
         required information
     :type image_process_dict: dict
     :return: dictionary with
