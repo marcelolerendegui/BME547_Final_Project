@@ -549,7 +549,21 @@ def get_unique_filename(names: list, name: str, ext: str) -> str:
 
 
 def image_process(image_process_dict: dict) -> dict:
+    """ Apply processing algorithm to an image
 
+    This function validates input data, fetches an image,
+    applies a processing algorithm to it, converts it to
+    a new format and stores it in the database as a new
+    image with a new image filename,
+
+
+    :param image_process_dict: dictionary with all the 
+        required information
+    :type image_process_dict: dict
+    :return: dictionary with
+        success(bool), error_msg(str)
+    :rtype: dict
+    """
     # Verify input types
     t_ok, t_err = is_type_ok(
         image_process_dict,
