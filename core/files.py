@@ -230,6 +230,13 @@ def files_from_zip(zip_fio: fileIO):
 
 
 def is_zip(zip_fio: fileIO) -> bool:
+    """check if fileIO is a zip
+    
+    :param zip_fio: fileIO to check
+    :type zip_fio: fileIO
+    :return: True if input fileIO is a zip, False othersise
+    :rtype: bool
+    """
     try:
         ZipFile(zip_fio, 'r')
         return True
