@@ -28,9 +28,17 @@ from skimage import exposure
 from skimage import io
 from PIL import Image
 import matplotlib.pyplot as plt
+fileIO = IO.IOBase
 
 
-def is_image(img_fio) -> bool:
+def is_image(img_fio: fileIO) -> bool:
+    """check if fileIO is an image
+
+    :param img_fio: fileIO to check
+    :type img_fio: fileIO
+    :return: True if input fileIO is an image, False othersise
+    :rtype: bool
+    """
     img_fio.seek(0)
     try:
         Image.open(img_fio)
@@ -39,7 +47,14 @@ def is_image(img_fio) -> bool:
         return False
 
 
-def get_image_size(img_fio) -> str:
+def get_image_size(img_fio: fileIO) -> str:
+    """get size of the image in pixels
+
+    :param img_fio: file IO of an image
+    :type img_fio: fileIO
+    :return: string formatted: 'widtxheight'
+    :rtype: str
+    """
     img_fio.seek(0)
     img = Image.open(img_fio)
     width, height = img.size
@@ -47,7 +62,14 @@ def get_image_size(img_fio) -> str:
     return str(width) + 'x' + str(height)
 
 
-def get_image_format(img_fio) -> str:
+def get_image_format(img_fio: fileIO) -> str:
+    """get format of the fileIO image
+
+    :param img_fio: file IO of an image
+    :type img_fio: fileIO
+    :return: string with the format
+    :rtype: str
+    """
     img_fio.seek(0)
     img = Image.open(img_fio)
     img_fio.seek(0)
@@ -55,6 +77,13 @@ def get_image_format(img_fio) -> str:
 
 
 def is_valid_algorithm(algorithm: str) -> bool:
+    """check if the input algorithm is valid
+
+    :param algorithm: algorithm name
+    :type algorithm: str
+    :return: True if the algorithm is valid
+    :rtype: bool
+    """
     available_algorithms = [
         'Histogram Equalization',
         'Contrast Stretching',
@@ -65,7 +94,16 @@ def is_valid_algorithm(algorithm: str) -> bool:
     return algorithm in available_algorithms
 
 
-def transform_image(img_fio, algorithm: str):
+def transform_image(img_fio: fileIO, algorithm: str) -> fileIO:
+    """apply a image processing algorithm to a image fileIO
+
+    :param img_fio: file IO of an image to transform
+    :type img_fio: fileIO
+    :param algorithm: algorithm name
+    :type algorithm: str
+    :return: file IO of the transformed image
+    :rtype: fileIO
+    """
     img_fio.seek(0)
     if algorithm == 'Histogram Equalization':
         return histogram_equalization(img_fio)
@@ -81,7 +119,14 @@ def transform_image(img_fio, algorithm: str):
         return img_fio
 
 
-def histogram_equalization(img_fio):
+def histogram_equalization(img_fio: fileIO) -> fileIO:
+    """ transform image using histogram equalization
+
+    :param img_fio: file IO of an image to transform
+    :type img_fio: fileIO
+    :return: file IO of the transformed image
+    :rtype: fileIO
+    """
     img_fio.seek(0)
     img = io.imread(img_fio)
 
@@ -99,7 +144,22 @@ def histogram_equalization(img_fio):
     return out_fio
 
 
-def contrast_stretch(img_fio, lower_perc: int, higher_perc: int):
+def contrast_stretch(
+    img_fio: fileIO,
+    lower_perc: int,
+    higher_perc: int
+) -> fileIO:
+    """ transform image using contrast stretch
+
+    :param img_fio: file IO of an image to transform
+    :type img_fio: fileIO
+    :param lower_perc: lower percentile where to cut the contrast
+    :type lower_perc: int
+    :param higher_perc: higher percentile where to cut the contrast
+    :type higher_perc: int
+    :return: file IO of the transformed image
+    :rtype: fileIO
+    """
     img_fio.seek(0)
     image = io.imread(img_fio)
     pl, ph = np.percentile(image, (lower_perc, higher_perc))
@@ -116,7 +176,14 @@ def contrast_stretch(img_fio, lower_perc: int, higher_perc: int):
     return out_fio
 
 
-def log_compression(img_fio):
+def log_compression(img_fio: fileIO) -> fileIO:
+    """ transform image using log compression
+
+    :param img_fio: file IO of an image to transform
+    :type img_fio: fileIO
+    :return: file IO of the transformed image
+    :rtype: fileIO
+    """
     img_fio.seek(0)
     image = io.imread(img_fio)
 
@@ -133,24 +200,45 @@ def log_compression(img_fio):
     return out_fio
 
 
-def contrast_invert(img_fio):
+def contrast_invert(img_fio: fileIO) -> fileIO:
+    """ transform image using contrast invert
+
+    :param img_fio: file IO of an image to transform
+    :type img_fio: fileIO
+    :return: file IO of the transformed image
+    :rtype: fileIO
+    """
     img_fio.seek(0)
+
+    # read the image
     image = io.imread(img_fio)
 
+    # apply contrast inversion
     img_output = util.invert(image)
 
+    # create a PIL Image
     outimg = Image.fromarray(img_output)
 
+    # Create new file IO
     out_fio = IO.BytesIO()
 
+    # save the PIL Image to the output fileIO
     outimg.save(out_fio, get_image_format(img_fio))
+
     img_fio.seek(0)
     out_fio.seek(0)
 
     return out_fio
 
 
-def format_convert(img_fio, im_format: str):
+def format_convert(img_fio: fileIO, im_format: str) -> fileIO:
+    """ change the image format
+
+    :param img_fio: file IO of an image to transform
+    :type img_fio: fileIO
+    :return: file IO of the transformed image
+    :rtype: fileIO
+    """
     img_fio.seek(0)
 
     # Create new file IO
@@ -165,6 +253,7 @@ def format_convert(img_fio, im_format: str):
     # Rewind and return
     img_fio.seek(0)
     out_fio.seek(0)
+
     return out_fio
 
 
