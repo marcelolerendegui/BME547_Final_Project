@@ -269,6 +269,13 @@ def ext_from_path(path: str) -> str:
 
 
 def name_from_path(path: str) -> str:
+    """extract file name from path
+    
+    :param path: full path to analyze
+    :type path: str
+    :return: file name: 'name'
+    :rtype: str
+    """
     nameext = nameext_from_path(path)
     name = os.path.splitext(nameext)[0]
     return name
