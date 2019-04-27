@@ -28,54 +28,124 @@ fileIO = io.IOBase
 
 
 def s_to_b(s: str) -> bytes:
+    """convert string to bytes
+
+    :param s: input string
+    :type s: str
+    :return: output bytes
+    :rtype: bytes
+    """
     b = s.encode('utf8')
     return b
 
 
 def s_to_b64s(s: str) -> str:
+    """convert string to base 64 string
+
+    :param s: input string
+    :type s: str
+    :return: output base 64 string
+    :rtype: str
+    """
     b64s = base64.b64encode(s.encode('utf8')).decode('utf8')
     return b64s
 
 
 def s_to_fio(s: str) -> fileIO:
+    """convert string to fileIO
+
+    :param s: input string
+    :type s: str
+    :return: output fileIO
+    :rtype: fileIO
+    """
     fio = io.BytesIO(s.encode('utf8'))
     fio.seek(0)
     return fio
 
 
 def b_to_s(b: bytes) -> str:
+    """convert bytes to string
+
+    :param b: input bytes
+    :type b: bytes
+    :return: output string
+    :rtype: str
+    """
     s = b.decode('utf8')
     return s
 
 
 def b_to_b64s(b: bytes) -> str:
+    """convert bytes to base 64 string
+
+    :param b: input bytes
+    :type b: bytes
+    :return: output base 64 string
+    :rtype: str
+    """
     b64s = base64.b64encode(b).decode('utf8')
     return b64s
 
 
-def b_to_fio(b: bytes):
+def b_to_fio(b: bytes) -> fileIO:
+    """convert bytes to fileIO
+
+    :param b: input bytes
+    :type b: bytes
+    :return: output fileIO
+    :rtype: fileIO
+    """
     fio = io.BytesIO(b)
     fio.seek(0)
     return fio
 
 
 def b64s_to_b(b64s: str) -> bytes:
+    """convert base 64 strting to bytes
+
+    :param b64s: input base 64 string
+    :type b64s: str
+    :return: output bytes
+    :rtype: bytes
+    """
     b = base64.b64decode(b64s.encode('utf8'))
     return b
 
 
 def b64s_to_s(b64s: str) -> str:
+    """convert base 64 strting to string
+
+    :param b64s: input base 64 string
+    :type b64s: str
+    :return: output string
+    :rtype: str
+    """
     s = base64.b64decode(b64s.encode('utf8')).decode('utf8')
     return s
 
 
 def b64s_to_fio(b64s: str) -> fileIO:
+    """convert base 64 strting to fileIO
+
+    :param b64s: input base 64 string
+    :type b64s: str
+    :return: output fileIO
+    :rtype: fileIO
+    """
     fio = io.BytesIO(base64.b64decode(b64s.encode('utf8')))
     fio.seek(0)
     return fio
 
 
 def fio_to_b(fio: fileIO) -> bytes:
+    """convert fileIO to bytes
+
+    :param fio: input fileIO
+    :type fio: fileIO
+    :return: output bytes
+    :rtype: bytes
+    """
     fio.seek(0)
     b = fio.read()
     fio.seek(0)
@@ -83,6 +153,13 @@ def fio_to_b(fio: fileIO) -> bytes:
 
 
 def fio_to_s(fio: fileIO) -> str:
+    """convert fileIO to string
+
+    :param fio: input fileIO
+    :type fio: fileIO
+    :return: output string
+    :rtype: str
+    """
     fio.seek(0)
     s = fio.read().decode('utf8')
     fio.seek(0)
@@ -90,6 +167,13 @@ def fio_to_s(fio: fileIO) -> str:
 
 
 def fio_to_b64s(fio: fileIO) -> str:
+    """convert fileIO to base 64 string
+
+    :param fio: input fileIO
+    :type fio: fileIO
+    :return: output base 64 string
+    :rtype: str
+    """
     fio.seek(0)
     b64s = base64.b64encode(fio.read()).decode('utf8')
     fio.seek(0)
@@ -97,6 +181,19 @@ def fio_to_b64s(fio: fileIO) -> str:
 
 
 def create_zip_fio(names_s: list, datas_b64s: list) -> fileIO:
+    """create a zip fileIO from filenames and datas
+
+    this function creates a fileIO with a zip file containing
+    all the input files specified by their filenames and their
+    contents as base 64 strings.
+
+    :param names_s: list of filenames to put in the zip
+    :type names_s: list
+    :param datas_b64s: list of file contents in base 64 string
+    :type datas_b64s: list
+    :return: output fileIO with a zip file inside
+    :rtype: fileIO
+    """
     # Create empty bytesIO
     out_fio = io.BytesIO()
     # Open it as a zip
@@ -110,6 +207,15 @@ def create_zip_fio(names_s: list, datas_b64s: list) -> fileIO:
 
 
 def files_from_zip(zip_fio: fileIO):
+    """ generator that yields files from zip
+
+    This function returns a generator that yields:
+        filename, fileIO
+    for each file inside the input zip in fileIO 
+
+    :param zip_fio: zip fileIO
+    :type zip_fio: fileIO
+    """
     # Open zip file to read
     with ZipFile(zip_fio, 'r') as f:
         # Extract list of fullpath filenames
