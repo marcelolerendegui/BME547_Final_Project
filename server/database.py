@@ -117,6 +117,15 @@ def get_image(image_id: str, user_hash: str) -> Image:
 
 
 def get_all_user_images(user_hash: str):
+    """fetch all images for input user
+
+    TODO: Check if return type is a list or not
+
+    :param user_hash: hash of a user
+    :type user_hash: str
+    :return: list of images
+    :rtype: list
+    """
     try:
         image = Image.objects.raw({'user_hash': user_hash})
     except:
