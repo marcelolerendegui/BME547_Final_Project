@@ -273,6 +273,7 @@ def edit_image_description(edit_image_description_dict: dict) -> dict:
             'error_msg': t_err,
         }
 
+    # Extract image id and user hash from input data
     image_id = edit_image_description_dict['image_id']
     user_hash = edit_image_description_dict['user_hash']
 
@@ -290,6 +291,7 @@ def edit_image_description(edit_image_description_dict: dict) -> dict:
 
     # Edit Description
     image.description = edit_image_description_dict['description']
+
     # Save image
     try:
         image.save()
@@ -319,6 +321,7 @@ def edit_image_filename(edit_image_filename_dict: dict) -> dict:
         success(bool), error_msg(str)
     :rtype: dict
     """
+
     # Verify input types
     t_ok, t_err = is_type_ok(
         edit_image_filename_dict,
@@ -337,6 +340,7 @@ def edit_image_filename(edit_image_filename_dict: dict) -> dict:
             'error_msg': t_err,
         }
 
+    # Extract image id and user hash from input data
     image_id = edit_image_filename_dict['image_id']
     user_hash = edit_image_filename_dict['user_hash']
 
@@ -354,6 +358,7 @@ def edit_image_filename(edit_image_filename_dict: dict) -> dict:
 
     # Edit Description
     image.filename = edit_image_filename_dict['filename']
+    
     # Save image
     try:
         image.save()
