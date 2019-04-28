@@ -38,13 +38,22 @@ from client.GUIImageTable import GUIImageTable
 
 
 class ImageDisplayer(QObject):
+    """This class handles image display windows.
+    """
+
     def __init__(self):
         QObject.__init__(self)
         # List of display windows open
         self.img_displays = {}
 
-    def new_display(self, image_fio, filename: str):
+    def new_display(self, image_fio, title: str):
+        """Create new image display and store the object in a dictionary
 
+        :param image_fio: fileIO of the image to display
+        :type image_fio: fileIO
+        :param title: title to show on the new window
+        :type title: str
+        """
         if len(self.img_displays.keys()) > 0:
             max_index = max(self.img_displays.keys())
             empty_indices = list(
@@ -61,7 +70,7 @@ class ImageDisplayer(QObject):
         self.img_displays[new_index] = GUIShowImage(
             new_index,
             image_fio,
-            filename
+            title
         )
         self.img_displays[new_index].show()
         self.img_displays[new_index].on_close.connect(
@@ -74,15 +83,19 @@ class ImageDisplayer(QObject):
 
 
 class GUIShowImage(QMainWindow):
+    """Image Display Window Class
+    It stores its own windowID and emits it in a signal when it
+    closes
+    """
     on_close = QtCore.pyqtSignal(int)
 
-    def __init__(self, display_key, image_fio, filename: str):
+    def __init__(self, display_key: int, image_fio, title: str):
         # Setup main window
         super().__init__()
         self.centralWidget = QWidget(self)
         self.dkey = display_key
 
-        self.setWindowTitle(filename)
+        self.setWindowTitle(title)
 
         self.lbl_image = QLabel(self)
         self.lbl_image.setText('')
