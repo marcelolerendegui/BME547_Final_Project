@@ -39,35 +39,65 @@ def test_s_b_s(in_s):
     assert out_s == in_s
 
 
-def test_s_b64s_s():
+@pytest.mark.parametrize(
+    "in_s",
+    [
+        ('0123456789'),
+        ('abcdefghijklmnopqrstuvwxyz'),
+        ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+        ('~!@#$%^&*()_+=[]{};:",.<>/?'),
+        ("~!@#$%^&*()_+=[]{};:',.<>/?"),
+        ('0123456789abcdefghijABCDEFGHIJ~!@#$%^&*(~!@#$%^&*('),
+    ]
+)
+def test_s_b64s_s(in_s):
     from core.files import s_to_b64s
     from core.files import b64s_to_s
 
-    in_s = 'This is a Message!'
     b64s = s_to_b64s(in_s)
     out_s = b64s_to_s(b64s)
 
     assert out_s == in_s
 
 
-def test_s_fio_s():
+@pytest.mark.parametrize(
+    "in_s",
+    [
+        ('0123456789'),
+        ('abcdefghijklmnopqrstuvwxyz'),
+        ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+        ('~!@#$%^&*()_+=[]{};:",.<>/?'),
+        ("~!@#$%^&*()_+=[]{};:',.<>/?"),
+        ('0123456789abcdefghijABCDEFGHIJ~!@#$%^&*(~!@#$%^&*('),
+    ]
+)
+def test_s_fio_s(in_s):
     from core.files import s_to_fio
     from core.files import fio_to_s
 
-    in_s = 'This is a Message!'
     fio = s_to_fio(in_s)
     out_s = fio_to_s(fio)
 
     assert out_s == in_s
 
 
-def test_s_b_b64s_b_s():
+@pytest.mark.parametrize(
+    "in_s",
+    [
+        ('0123456789'),
+        ('abcdefghijklmnopqrstuvwxyz'),
+        ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+        ('~!@#$%^&*()_+=[]{};:",.<>/?'),
+        ("~!@#$%^&*()_+=[]{};:',.<>/?"),
+        ('0123456789abcdefghijABCDEFGHIJ~!@#$%^&*(~!@#$%^&*('),
+    ]
+)
+def test_s_b_b64s_b_s(in_s):
     from core.files import s_to_b
     from core.files import b_to_b64s
     from core.files import b64s_to_b
     from core.files import b_to_s
 
-    in_s = 'This is a Message!'
     b = s_to_b(in_s)
     b64s = b_to_b64s(b)
     out_b = b64s_to_b(b64s)
@@ -76,7 +106,18 @@ def test_s_b_b64s_b_s():
     assert out_s == in_s
 
 
-def test_s_b_b64s_fio_b64s_b_s():
+@pytest.mark.parametrize(
+    "in_s",
+    [
+        ('0123456789'),
+        ('abcdefghijklmnopqrstuvwxyz'),
+        ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+        ('~!@#$%^&*()_+=[]{};:",.<>/?'),
+        ("~!@#$%^&*()_+=[]{};:',.<>/?"),
+        ('0123456789abcdefghijABCDEFGHIJ~!@#$%^&*(~!@#$%^&*('),
+    ]
+)
+def test_s_b_b64s_fio_b64s_b_s(in_s):
     from core.files import s_to_b
     from core.files import b_to_b64s
     from core.files import b64s_to_fio
@@ -84,7 +125,6 @@ def test_s_b_b64s_fio_b64s_b_s():
     from core.files import b64s_to_b
     from core.files import b_to_s
 
-    in_s = 'This is a Message!'
     b = s_to_b(in_s)
     b64s = b_to_b64s(b)
     fio = b64s_to_fio(b64s)

@@ -258,7 +258,13 @@ def format_convert(img_fio: fileIO, im_format: str) -> fileIO:
 
 
 def fio_color_hist_fio(image_fio):
+    """Generate a fileIO with the color histogram of an image fileIO
 
+    :param image_fio: input image in fileIO format
+    :type image_fio: fileIO
+    :return: color histogram of the input image in fileIO format
+    :rtype: fileIO
+    """
     img_pil = Image.open(image_fio)
     r, g, b = img_pil.split()
 
@@ -277,6 +283,13 @@ def fio_color_hist_fio(image_fio):
 
 
 def fio_hist_fio(image_fio):
+    """Generate a fileIO with the histogram of an image fileIO
+
+     :param image_fio: input image in fileIO format
+     :type image_fio: fileIO
+     :return: histogram of the input image in fileIO format
+     :rtype: fileIO
+     """
     img_pil = Image.open(image_fio).convert('L')
 
     bins = list(range(256))

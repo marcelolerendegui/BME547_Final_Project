@@ -67,6 +67,7 @@ setup(
     install_requires=[
         'requests',
         'PyQt5',
+        'PyQt5-sip',
         'scikit-image',
         'numpy',
     ],
