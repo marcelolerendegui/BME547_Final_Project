@@ -653,7 +653,7 @@ def image_process(image_process_dict: dict) -> dict:
     result = db.add_image(
         filename=out_image_filename,
         img_format=out_image_format,
-        description='created from ' + in_image.filename,
+        description='Created using ' + algorithm + ' on ' + in_image.filename,
         size=im_size,
         timestamp=datetime.now(),
         data=fio_to_b64s(out_image_fio),
