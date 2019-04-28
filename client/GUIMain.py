@@ -44,9 +44,10 @@ class GUIMain(QMainWindow):
     def __init__(self):
         # Setup main window
         super().__init__()
-        self.resize(988, 505)
+        self.setWindowTitle("Image Processing Client")
+
         self.centralWidget = QWidget(self)
-        self.setGeometry(100, 100, 650, 500)
+        self.setGeometry(100, 100, 1000, 500)
 
         self.img_displayer = ImageDisplayer()
         # Table
