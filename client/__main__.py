@@ -22,9 +22,6 @@
 from client import app
 from client.GUI import GUI
 
-from PyQt5.QtWidgets import QApplication
-app = QApplication([])
-
 gui = GUI()
 
 app.exec_()
