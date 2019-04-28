@@ -51,7 +51,9 @@ class GUIMain(QMainWindow):
         self.img_displayer = ImageDisplayer()
         # Table
         self.tbl_images = GUIImageTable(self.centralWidget)
-
+        self.tbl_images.cellChanged.connect(
+            self.tbl_images_cell_changed_callback
+        )
         # Buttons
         self.create_button_block()
         self.setup_button_block()
@@ -159,7 +161,9 @@ class GUIMain(QMainWindow):
 
     def update_table(self):
         info_dict = api.get_images_info(self.user_hash)
+        self.tbl_images.blockSignals(True)
         self.tbl_images.load_data_from_dict(info_dict)
+        self.tbl_images.blockSignals(False)
 
     def btn_display_callback(self):
         ids = self.tbl_images.get_selected_ids()
@@ -304,6 +308,36 @@ class GUIMain(QMainWindow):
                         f.write(image_b)
         else:
             return
+
+    def tbl_images_cell_changed_callback(self, row: int, col: int):
+        """This is the callback from editing any of the table cells
+
+        :param row: edited cell row number
+        :type row: int
+        :param col: edited cell col number
+        :type col: int
+        """
+        editable_cols = {
+            'filename': 1,
+            'description': 4
+        }
+
+        if col not in editable_cols.values():
+            return
+
+        image_id = self.tbl_images.item(row, 0).text()
+        filename = self.tbl_images.item(row, 1).text()
+        description = self.tbl_images.item(row, 4).text()
+
+        if col == editable_cols['filename']:
+            ret = api.edit_filename(image_id, filename, self.user_hash)
+            if ret['success'] is False:
+                self.show_error(ret['error_msg'])
+
+        elif col == editable_cols['description']:
+            ret = api.edit_description(image_id, description, self.user_hash)
+            if ret['success'] is False:
+                self.show_error(ret['error_msg'])
 
 
 def fio_color_hist_fio(image_fio):
