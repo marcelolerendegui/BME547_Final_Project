@@ -23,6 +23,7 @@ from pymodm import connect, MongoModel, fields
 import os
 from server.database_model import Image
 from bson import ObjectId
+import logging
 
 
 def init():
@@ -76,7 +77,9 @@ def add_image(
 
     try:
         image_to_add.save()
+        logging.info("Image saved!")
     except:
+        logging.exception("ValueError: Img_dict has wrong format")
         return False
     return True
 
@@ -109,10 +112,13 @@ def get_image(image_id: str, user_hash: str) -> Image:
 
     try:
         image = Image.objects.raw({'_id': ObjectId(image_id)}).first()
+        logging.info("Image with the user get!")
         if image.user_hash != user_hash:
             image = None
+            logging.info("wrong user hash")
     except:
         image = None
+        logging.exception("img_id/user_hash format not string")
     return image
 
 
@@ -128,6 +134,8 @@ def get_all_user_images(user_hash: str):
     """
     try:
         image = Image.objects.raw({'user_hash': user_hash})
+        logging.info("retrieve all images from the user")
     except:
         image = None
+        logging.exception("ValueError: user_hash not string")
     return image
