@@ -34,7 +34,22 @@ def apply_algorithm(
     im_format: str,
     out_filename: str,
     user_hash: str
-):
+) -> dict:
+    """Apply an image processing algorithm ot an image
+
+    :param image_id: id of the image to process
+    :type image_id: str
+    :param algorithm: algorithm to apply
+    :type algorithm: str
+    :param im_format: format of the output image
+    :type im_format: str
+    :param out_filename: name of the output image
+    :type out_filename: str
+    :param user_hash: hash identifying a user
+    :type user_hash: str
+    :return: dictionary with info. see protocol
+    :rtype: dict
+    """
     # Validate image_id type
     t_ok, t_err = is_type_ok(image_id, "str")
     if t_ok is False:
@@ -77,10 +92,24 @@ def apply_algorithm(
         }
 
 
-def get_download_images(image_ids: str, im_format: str, user_hash: str):
+def get_download_images(
+    image_ids: list,
+    im_format: str,
+    user_hash: str
+) -> dict:
+    """run a get request to download images
 
+    :param image_ids: list of ids to download
+    :type image_ids: list
+    :param im_format: format to download
+    :type im_format: str
+    :param user_hash: hash identifying user
+    :type user_hash: str
+    :return: dictionary with info. see protocol
+    :rtype: dict
+    """
     # Validate image_ids type
-    t_ok, t_err = is_type_ok(image_ids, "str")
+    t_ok, t_err = is_type_ok(image_ids, "list[str]")
     if t_ok is False:
         return {'success':	False, 'error_msg': t_err}
 
@@ -109,8 +138,16 @@ def get_download_images(image_ids: str, im_format: str, user_hash: str):
         }
 
 
-def get_single_image(image_id: str, user_hash: str):
+def get_single_image(image_id: str, user_hash: str) -> dict:
+    """get single image from server
 
+    :param image_id: id of the image to download
+    :type image_id: str
+    :param user_hash: hash identifying user
+    :type user_hash: str
+    :return: dictionary with the info. see protocol
+    :rtype: dict
+    """
     # Validate image_id type
     t_ok, t_err = is_type_ok(image_id, "str")
     if t_ok is False:
@@ -136,8 +173,14 @@ def get_single_image(image_id: str, user_hash: str):
         }
 
 
-def get_images_info(user_hash: str):
+def get_images_info(user_hash: str) -> dict:
+    """get information of all the images that belong to the user
 
+    :param user_hash: hash identifying a user
+    :type user_hash: str
+    :return: dictionary with all the info. see protocol
+    :rtype: dict
+    """
     # Validate user_hash type
     t_ok, t_err = is_type_ok(user_hash, "str")
     if t_ok is False:
@@ -153,8 +196,18 @@ def get_images_info(user_hash: str):
         }
 
 
-def upload_image(image_b64s: str, filename: str, user_hash: str):
+def upload_image(image_b64s: str, filename: str, user_hash: str) -> dict:
+    """upload a single image to the server
 
+    :param image_b64s: image data as a base 64 string
+    :type image_b64s: str
+    :param filename: filename for the image
+    :type filename: str
+    :param user_hash: hash identifying the user
+    :type user_hash: str
+    :return: dictionary with info. see protocol
+    :rtype: dict
+    """
     # Validate image_b64s type
     t_ok, t_err = is_type_ok(image_b64s, "str")
     if t_ok is False:
@@ -186,8 +239,18 @@ def upload_image(image_b64s: str, filename: str, user_hash: str):
         }
 
 
-def upload_zip(zip_b64s: str, filename: str, user_hash: str):
+def upload_zip(zip_b64s: str, filename: str, user_hash: str) -> dict:
+    """upload multiple images as a zip
 
+    :param zip_b64s: zip file data as a base 64 string
+    :type zip_b64s: str
+    :param filename: filename of the zip
+    :type filename: str
+    :param user_hash: hash identifying a user
+    :type user_hash: str
+    :return: dictionary with info. see protocol
+    :rtype: dict
+    """
     # Validate zip_b64s type
     t_ok, t_err = is_type_ok(zip_b64s, "str")
     if t_ok is False:
@@ -218,35 +281,18 @@ def upload_zip(zip_b64s: str, filename: str, user_hash: str):
         }
 
 
-def upload_multiple_images(filename, user_hash):
+def edit_filename(image_id: str, new_fname: str, user_hash: str) -> dict:
+    """edit filename of an image
 
-    # Validate filename type
-    t_ok, t_err = is_type_ok(filename, "str")
-    if t_ok is False:
-        return {'success':	False, 'error_msg': t_err}
-
-    # Validate user_hash type
-    t_ok, t_err = is_type_ok(user_hash, "str")
-    if t_ok is False:
-        return {'success':	False, 'error_msg': t_err}
-
-    image_dic = {
-        "filename": filename,
-        "user_hash": user_hash,
-        "data": "The WHOLE zip file converted to a 64base string"
-    }
-    try:
-        r = requests.post(api_host + '/api/upload/zip', json=image_dic)
-        return r
-    except:
-        return {
-            'success': False,
-            'error_msg': 'Could not connect to server',
-        }
-
-
-def edit_filename(image_id: str, new_fname: str, user_hash: str):
-
+    :param image_id: id of the image to edit
+    :type image_id: str
+    :param new_fname: new filename for the image
+    :type new_fname: str
+    :param user_hash: hash identifying a user
+    :type user_hash: str
+    :return: dictionary with info. see protocol
+    :rtype: dict
+    """
     # Validate image_id type
     t_ok, t_err = is_type_ok(image_id, "str")
     if t_ok is False:
@@ -277,8 +323,18 @@ def edit_filename(image_id: str, new_fname: str, user_hash: str):
         }
 
 
-def edit_description(image_id: str, new_desc: str, user_hash: str):
+def edit_description(image_id: str, new_desc: str, user_hash: str) -> dict:
+    """edit description of an image
 
+    :param image_id: id of the image to edit
+    :type image_id: str
+    :param new_desc: new description for the image
+    :type new_desc: str
+    :param user_hash: hash identifying a user
+    :type user_hash: str
+    :return: dictionary with info. see protocol
+    :rtype: dict
+    """
     # Validate image_id type
     t_ok, t_err = is_type_ok(image_id, "str")
     if t_ok is False:
