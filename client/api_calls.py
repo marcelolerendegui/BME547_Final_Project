@@ -109,7 +109,6 @@ def equalize_histogram(image_id, image_format, filename):
     }
     r = requests.post(api_host + '/api/img_proc', json=data)
     return r
-    pass
 
 
 def contrast_stretch(image_id, image_format, filename):
@@ -167,3 +166,23 @@ def download_images(image_id, filename, image_format):
     im.save(str(filename), str(image_format))
     return im
     pass
+
+
+def edit_filename(image_id: str, new_fname: str, user_hash: str):
+    data = {
+        'image_id': image_id,
+        'filename': new_fname,
+        'user_hash': user_hash
+    }
+    r = requests.post(api_host + '/api/edit/filename', json=data)
+    return json.loads(r.text)
+
+
+def edit_description(image_id: str, new_desc: str, user_hash: str):
+    data = {
+        'image_id': image_id,
+        'description': new_desc,
+        'user_hash': user_hash
+    }
+    r = requests.post(api_host + '/api/edit/description', json=data)
+    return json.loads(r.text)
