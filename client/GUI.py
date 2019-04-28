@@ -33,6 +33,9 @@ class GUI(QObject):
         QObject.__init__(self)
         self.dlg_login = GUILoginDialog()
         self.dlg_login.login.connect(self.on_login)
+        self.client_gui = GUIMain()
+        self.client_gui.show()
+        self.client_gui.show_as_waiting(True)
         self.dlg_login.show()
 
     @pyqtSlot(str)
@@ -43,7 +46,6 @@ class GUI(QObject):
         :type user_hash: str
         """
         self.user_hash = user_hash
-        self.client_gui = GUIMain()
         self.client_gui.user_hash = user_hash
-        self.client_gui.show()
         self.client_gui.update_table()
+        self.client_gui.show_as_waiting(False)

@@ -51,6 +51,7 @@ class GUIMain(QMainWindow):
         self.setGeometry(100, 100, 1000, 500)
 
         self.img_displayer = ImageDisplayer()
+
         # Table
         self.tbl_images = GUIImageTable(self.centralWidget)
         self.tbl_images.cellChanged.connect(
@@ -171,6 +172,7 @@ class GUIMain(QMainWindow):
         self.update_table()
 
     def update_table(self):
+        self.show_as_waiting(True)
         ret = api.get_images_info(self.user_hash)
         if ret.get('success') is False:
             self.show_error(ret['error_msg'])
@@ -179,6 +181,7 @@ class GUIMain(QMainWindow):
         self.tbl_images.blockSignals(True)
         self.tbl_images.load_data_from_dict(ret)
         self.tbl_images.blockSignals(False)
+        self.show_as_waiting(False)
 
     def btn_display_callback(self):
         """Callback for the button DISPLAY
@@ -187,6 +190,7 @@ class GUIMain(QMainWindow):
         calls the api to get the image from the server
         displays the image in a new window
         """
+        self.show_as_waiting(True)
         ids = self.tbl_images.get_selected_ids()
         names = self.tbl_images.get_selected_names()
         for id, name in zip(ids, names):
@@ -196,6 +200,7 @@ class GUIMain(QMainWindow):
             else:
                 image_fio = b64s_to_fio(ret['data'])
                 self.img_displayer.new_display(image_fio, name)
+        self.show_as_waiting(False)
 
     def btn_compare_callback(self):
         """Callback for the button COMPARE
@@ -204,6 +209,7 @@ class GUIMain(QMainWindow):
         calls the api to get the image from the server
         displays the image in a new window
         """
+        self.show_as_waiting(True)
         mrs2_ids = self.tbl_images.get_mrs_ids(2)
         mrs2_names = self.tbl_images.get_mrs_names(2)
 
@@ -214,6 +220,7 @@ class GUIMain(QMainWindow):
             else:
                 image_fio = b64s_to_fio(ret['data'])
                 self.img_displayer.new_display(image_fio, name)
+        self.show_as_waiting(False)
 
     def btn_display_hist_callback(self):
         """Callback for the button DISPLAY HISTOGRAM
@@ -223,6 +230,7 @@ class GUIMain(QMainWindow):
         calculates the gray histogram
         displays the histogram in a new window
         """
+        self.show_as_waiting(True)
         ids = self.tbl_images.get_selected_ids()
         names = self.tbl_images.get_selected_names()
 
@@ -237,6 +245,7 @@ class GUIMain(QMainWindow):
                     img_hist_fio, name + ' Histogram')
                 del image_fio
                 del img_hist_fio
+        self.show_as_waiting(False)
 
     def btn_display_color_hist_callback(self):
         """Callback for the button DISPLAY COLOR HISTOGRAM
@@ -246,6 +255,7 @@ class GUIMain(QMainWindow):
         calculates the color histogram
         displays the histogram in a new window
         """
+        self.show_as_waiting(True)
         ids = self.tbl_images.get_selected_ids()
         names = self.tbl_images.get_selected_names()
 
@@ -258,6 +268,7 @@ class GUIMain(QMainWindow):
                 img_hist_fio = img_proc.fio_color_hist_fio(image_fio)
                 self.img_displayer.new_display(
                     img_hist_fio, name + ' Histogram')
+        self.show_as_waiting(False)
 
     def image_proc_selected(self, algorithm: str):
         """Apply algorithm to all selected images
@@ -265,6 +276,7 @@ class GUIMain(QMainWindow):
         :param algorithm: name of the algorithm
         :type algorithm: str
         """
+        self.show_as_waiting(True)
         rows = self.tbl_images.get_selected_rows()
         ids = []
         names = []
@@ -282,26 +294,35 @@ class GUIMain(QMainWindow):
             if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
         self.update_table()
+        self.show_as_waiting(False)
 
     def btn_contrast_invert_callback(self):
         """Callback for the button CONTRAST INVERT
         """
+        self.show_as_waiting(True)
         self.image_proc_selected('Contrast Invert')
+        self.show_as_waiting(False)
 
     def btn_equalize_hist_callback(self):
         """Callback for the button EQUALIZE HISTOGRAM
         """
+        self.show_as_waiting(True)
         self.image_proc_selected('Histogram Equalization')
+        self.show_as_waiting(False)
 
     def btn_contrast_stretch_callback(self):
         """Callback for the button CONTRAST STRETCH
         """
+        self.show_as_waiting(True)
         self.image_proc_selected('Contrast Stretching')
+        self.show_as_waiting(False)
 
     def btn_log_compress_callback(self):
         """Callback for the button LOG COMPRESS
         """
+        self.show_as_waiting(True)
         self.image_proc_selected('Log Compression')
+        self.show_as_waiting(False)
 
     def show_error(self, message: str):
         """Display error message in a window
@@ -314,17 +335,23 @@ class GUIMain(QMainWindow):
     def download_images_jpg(self):
         """Callback for button DOWNLOAD JPEG
         """
+        self.show_as_waiting(True)
         self.download_images('JPEG')
+        self.show_as_waiting(False)
 
     def download_images_png(self):
         """Callback for button DOWNLOAD PNG
         """
+        self.show_as_waiting(True)
         self.download_images('PNG')
+        self.show_as_waiting(False)
 
     def download_images_tiff(self):
         """Callback for button DOWNLOAD TIFF
         """
+        self.show_as_waiting(True)
         self.download_images('TIFF')
+        self.show_as_waiting(False)
 
     def download_images(self, im_format: str):
         """Download all selected images in a specified format
@@ -409,3 +436,16 @@ class GUIMain(QMainWindow):
             ret = api.edit_description(image_id, description, self.user_hash)
             if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
+
+
+    def show_as_waiting(self, show: bool):
+
+        if show is True:
+            self.setEnabled(False)
+            self.setWindowTitle('WAITING FOR SERVER')
+            self.update()
+            self.repaint()
+        else:
+            self.setEnabled(True)
+            self.setWindowTitle('Image Processing Client')
+            
