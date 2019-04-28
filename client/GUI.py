@@ -26,6 +26,9 @@ from PyQt5.QtCore import pyqtSlot
 
 
 class GUI(QObject):
+    """This GUI class is in charge of opening the other windows
+    """
+
     def __init__(self):
         QObject.__init__(self)
         self.dlg_login = GUILoginDialog()
@@ -33,7 +36,12 @@ class GUI(QObject):
         self.dlg_login.show()
 
     @pyqtSlot(str)
-    def on_login(self, user_hash):
+    def on_login(self, user_hash: str):
+        """Slot to be called after having the user hash
+
+        :param user_hash: hash that identifies a user
+        :type user_hash: str
+        """
         self.user_hash = user_hash
         self.client_gui = GUIMain()
         self.client_gui.user_hash = user_hash

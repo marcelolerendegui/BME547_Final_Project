@@ -40,6 +40,8 @@ import matplotlib.pyplot as plt
 
 
 class GUIMain(QMainWindow):
+    """Main window of the client
+    """
 
     def __init__(self):
         # Setup main window
@@ -67,6 +69,8 @@ class GUIMain(QMainWindow):
         self.setCentralWidget(self.centralWidget)
 
     def create_button_block(self):
+        """creates a grid of 3 by 3 buttons
+        """
         self.btn_compare = QPushButton(self.centralWidget)
         self.btn_display = QPushButton(self.centralWidget)
         self.btn_display_hist = QPushButton(self.centralWidget)
@@ -100,6 +104,8 @@ class GUIMain(QMainWindow):
         self.lay_button_block.addWidget(self.btn_upload, 3, 2)
 
     def setup_button_block(self):
+        """Setup all button properties for the button block
+        """
         self.btn_contrast_invert.setText("Contrast Invert")
         self.btn_display.setText("Display")
         self.btn_display_hist.setText("Display HIST")
@@ -131,6 +137,11 @@ class GUIMain(QMainWindow):
         self.btn_dload_tiff.clicked.connect(self.download_images_tiff)
 
     def btn_upload_callback(self):
+        """Callback for the button UPLOAD
+
+        Asks the user to select a file and calls the api to send it
+        to the server.
+        """
         # Create File Select Dialog
         dialog = QFileDialog(parent=self, caption='Images')
         dialog.setMimeTypeFilters(
@@ -171,6 +182,12 @@ class GUIMain(QMainWindow):
         self.tbl_images.blockSignals(False)
 
     def btn_display_callback(self):
+        """Callback for the button DISPLAY
+
+        for each selected row:
+        calls the api to get the image from the server
+        displays the image in a new window
+        """
         ids = self.tbl_images.get_selected_ids()
         names = self.tbl_images.get_selected_names()
         for id, name in zip(ids, names):
@@ -182,6 +199,12 @@ class GUIMain(QMainWindow):
                 self.img_displayer.new_display(image_fio, name)
 
     def btn_compare_callback(self):
+        """Callback for the button COMPARE
+
+        for the two most recently selected rows
+        calls the api to get the image from the server
+        displays the image in a new window
+        """
         mrs2_ids = self.tbl_images.get_mrs_ids(2)
         mrs2_names = self.tbl_images.get_mrs_names(2)
 
@@ -194,6 +217,13 @@ class GUIMain(QMainWindow):
                 self.img_displayer.new_display(image_fio, name)
 
     def btn_display_hist_callback(self):
+        """Callback for the button DISPLAY HISTOGRAM
+
+        for each selected row:
+        calls the api to get the image from the server
+        calculates the gray histogram
+        displays the histogram in a new window
+        """
         ids = self.tbl_images.get_selected_ids()
         names = self.tbl_images.get_selected_names()
 
@@ -210,6 +240,13 @@ class GUIMain(QMainWindow):
                 del img_hist_fio
 
     def btn_display_color_hist_callback(self):
+        """Callback for the button DISPLAY COLOR HISTOGRAM
+
+        for each selected row:
+        calls the api to get the image from the server
+        calculates the color histogram
+        displays the histogram in a new window
+        """
         ids = self.tbl_images.get_selected_ids()
         names = self.tbl_images.get_selected_names()
 
@@ -223,10 +260,12 @@ class GUIMain(QMainWindow):
                 self.img_displayer.new_display(
                     img_hist_fio, name + ' Histogram')
 
-    def btn_contrast_invert_callback(self):
-        self.image_proc_selected('Contrast Invert')
-
     def image_proc_selected(self, algorithm: str):
+        """Apply algorithm to all selected images
+
+        :param algorithm: name of the algorithm
+        :type algorithm: str
+        """
         rows = self.tbl_images.get_selected_rows()
         ids = []
         names = []
@@ -245,31 +284,58 @@ class GUIMain(QMainWindow):
                 self.show_error(ret['error_msg'])
         self.update_table()
 
+    def btn_contrast_invert_callback(self):
+        """Callback for the button CONTRAST INVERT
+        """
+        self.image_proc_selected('Contrast Invert')
+
     def btn_equalize_hist_callback(self):
+        """Callback for the button EQUALIZE HISTOGRAM
+        """
         self.image_proc_selected('Histogram Equalization')
 
     def btn_contrast_stretch_callback(self):
+        """Callback for the button CONTRAST STRETCH
+        """
         self.image_proc_selected('Contrast Stretching')
 
     def btn_log_compress_callback(self):
+        """Callback for the button LOG COMPRESS
+        """
         self.image_proc_selected('Log Compression')
 
     def show_error(self, message: str):
-        QMessageBox.about(self, 'Errormessage', message)
+        """Display error message in a window
 
-    def on_process_done(self):
-        QMessageBox.about(self, 'Process Done', 'Process Done')
+        :param message: error message to display
+        :type message: str
+        """
+        QMessageBox.about(self, 'Error!', message)
 
     def download_images_jpg(self):
+        """Callback for button DOWNLOAD JPEG
+        """
         self.download_images('JPEG')
 
     def download_images_png(self):
+        """Callback for button DOWNLOAD PNG
+        """
         self.download_images('PNG')
 
     def download_images_tiff(self):
+        """Callback for button DOWNLOAD TIFF
+        """
         self.download_images('TIFF')
 
-    def download_images(self, im_format):
+    def download_images(self, im_format: str):
+        """Download all selected images in a specified format
+
+        If many images were selected, they are downloaded as a zip
+        If only one image is selected, it is downloaded as an image
+
+        :param im_format: format of the output images
+        :type im_format: str
+        """
         rows = self.tbl_images.get_selected_rows()
         ids = []
         names = []
@@ -280,7 +346,7 @@ class GUIMain(QMainWindow):
         if len(ids) == 1:
 
             # Create File Save Dialog
-            dialog = QFileDialog(parent=self, caption='111Save As..')
+            dialog = QFileDialog(parent=self, caption='Save As..')
 
             dialog.setMimeTypeFilters(["image/"+im_format.lower()])
             dialog.setFileMode(QFileDialog.AnyFile)
