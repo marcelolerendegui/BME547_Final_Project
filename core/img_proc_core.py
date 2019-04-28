@@ -131,7 +131,7 @@ def histogram_equalization(img_fio: fileIO) -> fileIO:
     img = io.imread(img_fio)
 
     for channel in range(img.shape[2]):
-        img[:, :, channel] = exposure.equalize_hist(img[:, :, channel])
+        img[:, :, channel] = exposure.equalize_hist(img[:, :, channel])*255
 
     outimg = Image.fromarray(img)
 

@@ -35,22 +35,27 @@ from PyQt5.QtWidgets import QMessageBox
 from client.GUIImageTable import GUIImageTable
 from client.GUIShowImage import ImageDisplayer
 from client.GUIShowImage import GUIShowImage
-import core.img_proc_core as im_proc_doc
+import core.img_proc_core as img_proc
 
 
 class GUIMain(QMainWindow):
+    """Main window of the client
+    """
 
     def __init__(self):
         # Setup main window
         super().__init__()
-        self.resize(988, 505)
+        self.setWindowTitle("Image Processing Client")
+
         self.centralWidget = QWidget(self)
-        self.setGeometry(100, 100, 650, 500)
+        self.setGeometry(100, 100, 1000, 500)
 
         self.img_displayer = ImageDisplayer()
         # Table
         self.tbl_images = GUIImageTable(self.centralWidget)
-
+        self.tbl_images.cellChanged.connect(
+            self.tbl_images_cell_changed_callback
+        )
         # Buttons
         self.create_button_block()
         self.setup_button_block()
@@ -63,6 +68,8 @@ class GUIMain(QMainWindow):
         self.setCentralWidget(self.centralWidget)
 
     def create_button_block(self):
+        """creates a grid of 3 by 3 buttons
+        """
         self.btn_compare = QPushButton(self.centralWidget)
         self.btn_display = QPushButton(self.centralWidget)
         self.btn_display_hist = QPushButton(self.centralWidget)
@@ -96,6 +103,8 @@ class GUIMain(QMainWindow):
         self.lay_button_block.addWidget(self.btn_upload, 3, 2)
 
     def setup_button_block(self):
+        """Setup all button properties for the button block
+        """
         self.btn_contrast_invert.setText("Contrast Invert")
         self.btn_display.setText("Display")
         self.btn_display_hist.setText("Display HIST")
@@ -127,6 +136,11 @@ class GUIMain(QMainWindow):
         self.btn_dload_tiff.clicked.connect(self.download_images_tiff)
 
     def btn_upload_callback(self):
+        """Callback for the button UPLOAD
+
+        Asks the user to select a file and calls the api to send it
+        to the server.
+        """
         # Create File Select Dialog
         dialog = QFileDialog(parent=self, caption='Images')
         dialog.setMimeTypeFilters(
@@ -152,71 +166,105 @@ class GUIMain(QMainWindow):
                     nameext_from_path(filename),
                     self.user_hash
                 )
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
         self.update_table()
 
     def update_table(self):
-        info_dict = api.get_images_info(self.user_hash)
-        self.tbl_images.load_data_from_dict(info_dict)
+        ret = api.get_images_info(self.user_hash)
+        if ret.get('success') is False:
+            self.show_error(ret['error_msg'])
+            return
+
+        self.tbl_images.blockSignals(True)
+        self.tbl_images.load_data_from_dict(ret)
+        self.tbl_images.blockSignals(False)
 
     def btn_display_callback(self):
+        """Callback for the button DISPLAY
+
+        for each selected row:
+        calls the api to get the image from the server
+        displays the image in a new window
+        """
         ids = self.tbl_images.get_selected_ids()
         names = self.tbl_images.get_selected_names()
         for id, name in zip(ids, names):
             ret = api.get_single_image(id, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
                 self.img_displayer.new_display(image_fio, name)
 
     def btn_compare_callback(self):
+        """Callback for the button COMPARE
+
+        for the two most recently selected rows
+        calls the api to get the image from the server
+        displays the image in a new window
+        """
         mrs2_ids = self.tbl_images.get_mrs_ids(2)
         mrs2_names = self.tbl_images.get_mrs_names(2)
 
         for id, name in zip(mrs2_ids, mrs2_names):
             ret = api.get_single_image(id, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
                 self.img_displayer.new_display(image_fio, name)
 
     def btn_display_hist_callback(self):
+        """Callback for the button DISPLAY HISTOGRAM
+
+        for each selected row:
+        calls the api to get the image from the server
+        calculates the gray histogram
+        displays the histogram in a new window
+        """
         ids = self.tbl_images.get_selected_ids()
         names = self.tbl_images.get_selected_names()
 
         for id, name in zip(ids, names):
             ret = api.get_single_image(id, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
-                img_hist_fio = im_proc_doc.fio_hist_fio(image_fio)
+                img_hist_fio = img_proc.fio_hist_fio(image_fio)
                 self.img_displayer.new_display(
                     img_hist_fio, name + ' Histogram')
                 del image_fio
                 del img_hist_fio
 
     def btn_display_color_hist_callback(self):
+        """Callback for the button DISPLAY COLOR HISTOGRAM
+
+        for each selected row:
+        calls the api to get the image from the server
+        calculates the color histogram
+        displays the histogram in a new window
+        """
         ids = self.tbl_images.get_selected_ids()
         names = self.tbl_images.get_selected_names()
 
         for id, name in zip(ids, names):
             ret = api.get_single_image(id, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
-                img_hist_fio = im_proc_doc.fio_color_hist_fio(image_fio)
+                img_hist_fio = img_proc.fio_color_hist_fio(image_fio)
                 self.img_displayer.new_display(
                     img_hist_fio, name + ' Histogram')
 
-    def btn_contrast_invert_callback(self):
-        self.image_proc_selected('Contrast Invert')
-
     def image_proc_selected(self, algorithm: str):
+        """Apply algorithm to all selected images
+
+        :param algorithm: name of the algorithm
+        :type algorithm: str
+        """
         rows = self.tbl_images.get_selected_rows()
         ids = []
         names = []
@@ -231,35 +279,62 @@ class GUIMain(QMainWindow):
                 name,
                 self.user_hash
             )
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
         self.update_table()
 
+    def btn_contrast_invert_callback(self):
+        """Callback for the button CONTRAST INVERT
+        """
+        self.image_proc_selected('Contrast Invert')
+
     def btn_equalize_hist_callback(self):
+        """Callback for the button EQUALIZE HISTOGRAM
+        """
         self.image_proc_selected('Histogram Equalization')
 
     def btn_contrast_stretch_callback(self):
+        """Callback for the button CONTRAST STRETCH
+        """
         self.image_proc_selected('Contrast Stretching')
 
     def btn_log_compress_callback(self):
+        """Callback for the button LOG COMPRESS
+        """
         self.image_proc_selected('Log Compression')
 
     def show_error(self, message: str):
-        QMessageBox.about(self, 'Errormessage', message)
+        """Display error message in a window
 
-    def on_process_done(self):
-        QMessageBox.about(self, 'Process Done', 'Process Done')
+        :param message: error message to display
+        :type message: str
+        """
+        QMessageBox.about(self, 'Error!', message)
 
     def download_images_jpg(self):
+        """Callback for button DOWNLOAD JPEG
+        """
         self.download_images('JPEG')
 
     def download_images_png(self):
+        """Callback for button DOWNLOAD PNG
+        """
         self.download_images('PNG')
 
     def download_images_tiff(self):
+        """Callback for button DOWNLOAD TIFF
+        """
         self.download_images('TIFF')
 
-    def download_images(self, im_format):
+    def download_images(self, im_format: str):
+        """Download all selected images in a specified format
+
+        If many images were selected, they are downloaded as a zip
+        If only one image is selected, it is downloaded as an image
+
+        :param im_format: format of the output images
+        :type im_format: str
+        """
         rows = self.tbl_images.get_selected_rows()
         ids = []
         names = []
@@ -270,7 +345,7 @@ class GUIMain(QMainWindow):
         if len(ids) == 1:
 
             # Create File Save Dialog
-            dialog = QFileDialog(parent=self, caption='111Save As..')
+            dialog = QFileDialog(parent=self, caption='Save As..')
 
             dialog.setMimeTypeFilters(["image/"+im_format.lower()])
             dialog.setFileMode(QFileDialog.AnyFile)
@@ -278,7 +353,7 @@ class GUIMain(QMainWindow):
             if dialog.exec_() == QDialog.Accepted:
                 filename = dialog.selectedFiles()[0]
                 ret = api.get_download_images(ids, im_format, self.user_hash)
-                if ret['success'] is False:
+                if ret.get('success') is False:
                     self.show_error(ret['error_msg'])
                 else:
                     image_b = b64s_to_b(ret['data'])
@@ -295,7 +370,7 @@ class GUIMain(QMainWindow):
             if dialog.exec_() == QDialog.Accepted:
                 filename = dialog.selectedFiles()[0]
                 ret = api.get_download_images(ids, im_format, self.user_hash)
-                if ret['success'] is False:
+                if ret.get('success') is False:
                     self.show_error(ret['error_msg'])
                 else:
                     image_b = b64s_to_b(ret['data'])
@@ -303,3 +378,34 @@ class GUIMain(QMainWindow):
                         f.write(image_b)
         else:
             return
+
+
+    def tbl_images_cell_changed_callback(self, row: int, col: int):
+        """This is the callback from editing any of the table cells
+
+        :param row: edited cell row number
+        :type row: int
+        :param col: edited cell col number
+        :type col: int
+        """
+        editable_cols = {
+            'filename': 1,
+            'description': 4
+        }
+
+        if col not in editable_cols.values():
+            return
+
+        image_id = self.tbl_images.item(row, 0).text()
+        filename = self.tbl_images.item(row, 1).text()
+        description = self.tbl_images.item(row, 4).text()
+
+        if col == editable_cols['filename']:
+            ret = api.edit_filename(image_id, filename, self.user_hash)
+            if ret.get('success') is False:
+                self.show_error(ret['error_msg'])
+
+        elif col == editable_cols['description']:
+            ret = api.edit_description(image_id, description, self.user_hash)
+            if ret.get('success') is False:
+                self.show_error(ret['error_msg'])

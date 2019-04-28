@@ -29,10 +29,12 @@ from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QPushButton
 
-from client.encryption import get_userhash
+from core.encryption import get_userhash
 
 
 class GUILoginDialog(QMainWindow):
+    """Login window for the client
+    """
     login = QtCore.pyqtSignal(str)
 
     def __init__(self):
@@ -86,6 +88,8 @@ class GUILoginDialog(QMainWindow):
         self.setWindowModality(QtCore.Qt.ApplicationModal)
 
     def submit_username_password(self):
+        """Callback for the button login
+        """
         user_hash = get_userhash(
             self.txt_username.text(),
             self.txt_password.text()
