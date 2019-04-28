@@ -51,12 +51,30 @@ class GUIImageTable(QTableWidget):
     def load_data_from_dict(self, info):
         for r, (k, v) in enumerate(info.items()):
             self.setRowCount(r+1)
-            self.setItem(r, 0, QTableWidgetItem(k))
-            self.setItem(r, 1, QTableWidgetItem(v['filename']))
-            self.setItem(r, 2, QTableWidgetItem(v['img_format']))
-            self.setItem(r, 3, QTableWidgetItem(v['size']))
-            self.setItem(r, 4, QTableWidgetItem(v['description']))
-            self.setItem(r, 5, QTableWidgetItem(v['timestamp']))
+
+            item = QTableWidgetItem(k)
+            item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable)
+            self.setItem(r, 0, item)
+
+            item = QTableWidgetItem(v['filename'])
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+            self.setItem(r, 1, QTableWidgetItem(item))
+
+            item = QTableWidgetItem(v['img_format'])
+            item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable)
+            self.setItem(r, 2, QTableWidgetItem(item))
+
+            item = QTableWidgetItem(v['size'])
+            item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable)
+            self.setItem(r, 3, QTableWidgetItem(item))
+
+            item = QTableWidgetItem(v['description'])
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+            self.setItem(r, 4, QTableWidgetItem(item))
+
+            item = QTableWidgetItem(v['timestamp'])
+            item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable)
+            self.setItem(r, 5, QTableWidgetItem(item))
 
     def get_selected_rows(self):
         indexes = self.selectionModel().selectedRows()
