@@ -23,6 +23,8 @@ import requests
 import base64
 from PIL import Image
 from io import BytesIO
+from core.verification import is_type_ok
+
 api_host = "http://127.0.0.1:5000"
 
 
@@ -33,6 +35,31 @@ def apply_algorithm(
     out_filename: str,
     user_hash: str
 ):
+    # Validate image_id type
+    t_ok, t_err = is_type_ok(image_id, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate algorithm type
+    t_ok, t_err = is_type_ok(algorithm, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate im_format type
+    t_ok, t_err = is_type_ok(im_format, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate out_filename type
+    t_ok, t_err = is_type_ok(out_filename, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate user_hash type
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
     d = {
         'image_id': image_id,
         'algorithm': algorithm,
@@ -40,149 +67,243 @@ def apply_algorithm(
         'out_image_filename': out_filename,
         'user_hash': user_hash,
     }
-    r = requests.post(api_host+"/api/image_process", json=d)
-    return json.loads(r.text)
+    try:
+        r = requests.post(api_host+"/api/image_process", json=d)
+        return json.loads(r.text)
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not connect to server',
+        }
 
 
 def get_download_images(image_ids: str, im_format: str, user_hash: str):
+
+    # Validate image_ids type
+    t_ok, t_err = is_type_ok(image_ids, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate im_format type
+    t_ok, t_err = is_type_ok(im_format, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate user_hash type
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
     d = {
         'image_ids': image_ids,
         'format': im_format,
         'user_hash': user_hash
     }
-    r = requests.get(api_host+"/api/download/", json=d)
-    return json.loads(r.text)
+    try:
+        r = requests.get(api_host+"/api/download/", json=d)
+        return json.loads(r.text)
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not connect to server',
+        }
 
 
 def get_single_image(image_id: str, user_hash: str):
+
+    # Validate image_id type
+    t_ok, t_err = is_type_ok(image_id, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate user_hash type
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
     d = {
         'image_ids': [image_id],
         'format': 'PNG',
         'user_hash': user_hash
     }
-    r = requests.get(api_host+"/api/download/", json=d)
-    return json.loads(r.text)
+    try:
+        r = requests.get(api_host+"/api/download/", json=d)
+        return json.loads(r.text)
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not connect to server',
+        }
 
 
 def get_images_info(user_hash: str):
-    r = requests.get(api_host + '/api/image_info/' + user_hash)
-    return json.loads(r.text)
+
+    # Validate user_hash type
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    try:
+        r = requests.get(api_host + '/api/image_info/' + user_hash)
+        return json.loads(r.text)
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not connect to server',
+        }
 
 
-def upload_image(image_b64s, filename, user_hash):
+def upload_image(image_b64s: str, filename: str, user_hash: str):
+
+    # Validate image_b64s type
+    t_ok, t_err = is_type_ok(image_b64s, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate filename type
+    t_ok, t_err = is_type_ok(filename, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate user_hash type
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
     d = {
         'filename': filename,
         'user_hash': user_hash,
         'description': filename,
         'data': image_b64s,
     }
-    r = requests.post(api_host+"/api/upload/image", json=d)
-    return json.loads(r.text)
+    try:
+        r = requests.post(api_host+"/api/upload/image", json=d)
+        return json.loads(r.text)
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not connect to server',
+        }
 
 
-def upload_zip(zip_b64s, filename, user_hash):
+def upload_zip(zip_b64s: str, filename: str, user_hash: str):
+
+    # Validate zip_b64s type
+    t_ok, t_err = is_type_ok(zip_b64s, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate filename type
+    t_ok, t_err = is_type_ok(filename, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate user_hash type
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
     d = {
         'filename': filename,
         'user_hash': user_hash,
         'data': zip_b64s,
     }
-    r = requests.post(api_host+"/api/upload/zip", json=d)
-    return json.loads(r.text)
+    try:
+        r = requests.post(api_host+"/api/upload/zip", json=d)
+        return json.loads(r.text)
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not connect to server',
+        }
 
 
 def upload_multiple_images(filename, user_hash):
+
+    # Validate filename type
+    t_ok, t_err = is_type_ok(filename, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate user_hash type
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
     image_dic = {
         "filename": filename,
         "user_hash": user_hash,
         "data": "The WHOLE zip file converted to a 64base string"
     }
-    r = requests.post(api_host + '/api/upload/zip', json=image_dic)
-    return r
-
-
-def equalize_histogram(image_id, image_format, filename):
-    data = {
-        'image_id': image_id,
-        'algorithm': 'Histogram Equalization',
-        'out_image_format': image_format,
-        'out_image_filename': filename
-    }
-    r = requests.post(api_host + '/api/img_proc', json=data)
-    return r
-
-
-def contrast_stretch(image_id, image_format, filename):
-    data = {
-        'image_id': image_id,
-        'algorithm': 'Contrast Stretching',
-        'out_image_format': image_format,
-        'out_image_filename': filename
-    }
-    r = requests.post(api_host + '/api/img_proc', json=data)
-    return r
-    pass
-
-
-def log_compress(image_id, image_format, filename):
-    data = {
-        'image_id': image_id,
-        'algorithm': 'Log Compression',
-        'out_image_format': image_format,
-        'out_image_filename': filename
-    }
-    r = requests.post(api_host + '/api/img_proc', json=data)
-    return r
-    pass
-
-
-def convert(image_id, image_format, filename):
-    data = {
-        'image_id': image_id,
-        'algorithm': 'No Algorithm',
-        'out_image_format': image_format,
-        'out_image_filename': filename
-    }
-    r = requests.post(api_host + '/api/img_proc', json=data)
-    return r
-    pass
-
-
-def contrast_invert(image_id, image_format, filename):
-    data = {
-        'image_id': image_id,
-        'algorithm': 'contrast_invert',
-        'out_image_format': image_format,
-        'out_image_filename': filename
-    }
-    r = requests.post(api_host + '/api/img_proc', json=data)
-    return r
-    pass
-
-
-def download_images(image_id, filename, image_format):
-    r = requests.get(api_host + 'port/api/download/' + image_id)
-    img = r.json()
-    im = Image.open(BytesIO(base64.b64decode(img)))
-    im.save(str(filename), str(image_format))
-    return im
-    pass
+    try:
+        r = requests.post(api_host + '/api/upload/zip', json=image_dic)
+        return r
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not connect to server',
+        }
 
 
 def edit_filename(image_id: str, new_fname: str, user_hash: str):
+
+    # Validate image_id type
+    t_ok, t_err = is_type_ok(image_id, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate new_fname type
+    t_ok, t_err = is_type_ok(new_fname, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate user_hash type
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
     data = {
         'image_id': image_id,
         'filename': new_fname,
         'user_hash': user_hash
     }
-    r = requests.post(api_host + '/api/edit/filename', json=data)
-    return json.loads(r.text)
+    try:
+        r = requests.post(api_host + '/api/edit/filename', json=data)
+        return json.loads(r.text)
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not connect to server',
+        }
 
 
 def edit_description(image_id: str, new_desc: str, user_hash: str):
+
+    # Validate image_id type
+    t_ok, t_err = is_type_ok(image_id, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate new_desc type
+    t_ok, t_err = is_type_ok(new_desc, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
+    # Validate user_hash type
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return {'success':	False, 'error_msg': t_err}
+
     data = {
         'image_id': image_id,
         'description': new_desc,
         'user_hash': user_hash
     }
-    r = requests.post(api_host + '/api/edit/description', json=data)
-    return json.loads(r.text)
+    try:
+        r = requests.post(api_host + '/api/edit/description', json=data)
+        return json.loads(r.text)
+    except:
+        return {
+            'success': False,
+            'error_msg': 'Could not connect to server',
+        }

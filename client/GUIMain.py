@@ -161,9 +161,15 @@ class GUIMain(QMainWindow):
         self.update_table()
 
     def update_table(self):
-        info_dict = api.get_images_info(self.user_hash)
+
+        ret = api.get_images_info(self.user_hash)
+
+        if ret['success'] is False:
+            self.show_error(ret['error_msg'])
+            return
+
         self.tbl_images.blockSignals(True)
-        self.tbl_images.load_data_from_dict(info_dict)
+        self.tbl_images.load_data_from_dict(ret)
         self.tbl_images.blockSignals(False)
 
     def btn_display_callback(self):
