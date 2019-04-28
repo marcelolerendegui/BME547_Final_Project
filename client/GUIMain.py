@@ -306,6 +306,27 @@ class GUIMain(QMainWindow):
             return
 
 
+def tbl_images_cell_changed_callback(row: int, col: int):
+    """This is the callback from editing any of the table cells
+
+    :param row: edited cell row number
+    :type row: int
+    :param col: edited cell col number
+    :type col: int
+    """
+    editable_cols = [1, 3]
+
+    if col not in editable_cols:
+        return
+
+    if col == 1:
+        # Edit Filename
+        pass
+    elif col == 2:
+        # Edit Description
+        pass
+
+
 def fio_color_hist_fio(image_fio):
 
     img_pil = Image.open(image_fio)
