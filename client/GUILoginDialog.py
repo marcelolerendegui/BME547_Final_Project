@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QPushButton
 
-from client.encryption import get_userhash
+from core.encryption import get_userhash
 
 
 class GUILoginDialog(QMainWindow):
