@@ -156,14 +156,18 @@ class GUIMain(QMainWindow):
                     nameext_from_path(filename),
                     self.user_hash
                 )
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
         self.update_table()
 
     def update_table(self):
-        info_dict = api.get_images_info(self.user_hash)
+        ret = api.get_images_info(self.user_hash)
+        if ret.get('success') is False:
+            self.show_error(ret['error_msg'])
+            return
+
         self.tbl_images.blockSignals(True)
-        self.tbl_images.load_data_from_dict(info_dict)
+        self.tbl_images.load_data_from_dict(ret)
         self.tbl_images.blockSignals(False)
 
     def btn_display_callback(self):
@@ -171,7 +175,7 @@ class GUIMain(QMainWindow):
         names = self.tbl_images.get_selected_names()
         for id, name in zip(ids, names):
             ret = api.get_single_image(id, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
@@ -183,7 +187,7 @@ class GUIMain(QMainWindow):
 
         for id, name in zip(mrs2_ids, mrs2_names):
             ret = api.get_single_image(id, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
@@ -195,7 +199,7 @@ class GUIMain(QMainWindow):
 
         for id, name in zip(ids, names):
             ret = api.get_single_image(id, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
@@ -211,7 +215,7 @@ class GUIMain(QMainWindow):
 
         for id, name in zip(ids, names):
             ret = api.get_single_image(id, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
@@ -237,7 +241,7 @@ class GUIMain(QMainWindow):
                 name,
                 self.user_hash
             )
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
         self.update_table()
 
@@ -284,7 +288,7 @@ class GUIMain(QMainWindow):
             if dialog.exec_() == QDialog.Accepted:
                 filename = dialog.selectedFiles()[0]
                 ret = api.get_download_images(ids, im_format, self.user_hash)
-                if ret['success'] is False:
+                if ret.get('success') is False:
                     self.show_error(ret['error_msg'])
                 else:
                     image_b = b64s_to_b(ret['data'])
@@ -301,7 +305,7 @@ class GUIMain(QMainWindow):
             if dialog.exec_() == QDialog.Accepted:
                 filename = dialog.selectedFiles()[0]
                 ret = api.get_download_images(ids, im_format, self.user_hash)
-                if ret['success'] is False:
+                if ret.get('success') is False:
                     self.show_error(ret['error_msg'])
                 else:
                     image_b = b64s_to_b(ret['data'])
@@ -332,12 +336,12 @@ class GUIMain(QMainWindow):
 
         if col == editable_cols['filename']:
             ret = api.edit_filename(image_id, filename, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
 
         elif col == editable_cols['description']:
             ret = api.edit_description(image_id, description, self.user_hash)
-            if ret['success'] is False:
+            if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
 
 
