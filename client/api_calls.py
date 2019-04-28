@@ -33,6 +33,16 @@ def apply_algorithm(
     out_filename: str,
     user_hash: str
 ):
+    """
+    this function is to post the processed image to server as json file
+    including image information as below.
+    :param image_id: image id
+    :param algorithm:
+    :param im_format:
+    :param out_filename:
+    :param user_hash:
+    :return r.text:
+    """
     d = {
         'image_id': image_id,
         'algorithm': algorithm,
