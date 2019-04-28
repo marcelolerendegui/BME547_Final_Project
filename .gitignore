@@ -8,7 +8,6 @@ env/
 *.jpg
 *.png
 *.tiff
-*.log
 .data/
 *.egg-info
 dist
