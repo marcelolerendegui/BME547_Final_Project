@@ -692,7 +692,6 @@ def get_log() -> dict:
 def check_existance_and_fetch_image(image_id: str, user_hash: str) -> tuple:
     """checks if the image_id is in the database for the user and returns it.
 
-
     :param image_id: image_id to find
     :type image_id: str
     :param user_hash: hash that identifies a user
@@ -700,6 +699,16 @@ def check_existance_and_fetch_image(image_id: str, user_hash: str) -> tuple:
     :return: Success, error message, Image
     :rtype: tuple
     """
+
+    # Verify input types
+    t_ok, t_err = is_type_ok(image_id, "str")
+    if t_ok is False:
+        return False, t_err, None
+
+    t_ok, t_err = is_type_ok(user_hash, "str")
+    if t_ok is False:
+        return False, t_err, None
+
     if db.image_exists(image_id, user_hash) is False:
         return False, 'No image id: ' + image_id + ' found for the user', None
     else:
