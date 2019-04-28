@@ -379,7 +379,6 @@ class GUIMain(QMainWindow):
         else:
             return
 
-
     def tbl_images_cell_changed_callback(self, row: int, col: int):
         """This is the callback from editing any of the table cells
 
