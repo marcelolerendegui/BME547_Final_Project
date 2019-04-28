@@ -406,7 +406,6 @@ class GUIMain(QMainWindow):
         else:
             return
 
-
     def tbl_images_cell_changed_callback(self, row: int, col: int):
         """This is the callback from editing any of the table cells
 
@@ -437,7 +436,6 @@ class GUIMain(QMainWindow):
             if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
 
-
     def show_as_waiting(self, show: bool):
 
         if show is True:
@@ -448,4 +446,3 @@ class GUIMain(QMainWindow):
         else:
             self.setEnabled(True)
             self.setWindowTitle('Image Processing Client')
-            
