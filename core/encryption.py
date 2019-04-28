@@ -24,13 +24,15 @@ from hashlib import sha256
 
 
 def get_userhash(username: str, password: str) -> str:
-    """
-    generate a username/password combined MD5 hash for encryption
+    """generate a username/password combined SHA256 for identification
+    the returned user_hash is the sha256 encryption of:
+    USERNAME|PASSWORD   with | meaning concatenation
+
     :param username: login user name set by user
     :type username: str
     :param password: login password set by user
     :type password: str
-    :return: encoded SHA256 hash for database
+    :return: encoded SHA256 user hash
     :rtype: str
     """
     original_word = "".join([username, password]).encode('utf8').rstrip()
