@@ -27,6 +27,7 @@ from skimage import util
 from skimage import exposure
 from skimage import io
 from PIL import Image
+import matplotlib.pyplot as plt
 fileIO = IO.IOBase
 
 
@@ -254,3 +255,38 @@ def format_convert(img_fio: fileIO, im_format: str) -> fileIO:
     out_fio.seek(0)
 
     return out_fio
+
+
+def fio_color_hist_fio(image_fio):
+
+    img_pil = Image.open(image_fio)
+    r, g, b = img_pil.split()
+
+    bins = list(range(256))
+    plt.plot(bins, r.histogram(), 'r')
+    plt.plot(bins, g.histogram(), 'g')
+    plt.plot(bins, b.histogram(), 'b')
+    plt.xlabel('Pixel value')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    out_img_fio = IO.BytesIO()
+    plt.savefig(out_img_fio)
+    plt.close()
+    out_img_fio.seek(0)
+    return out_img_fio
+
+
+def fio_hist_fio(image_fio):
+    img_pil = Image.open(image_fio).convert('L')
+
+    bins = list(range(256))
+    plt.plot(bins, img_pil.histogram(), 'k')
+    plt.xlabel('Pixel value')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    out_img_fio = IO.BytesIO()
+    plt.savefig(out_img_fio)
+    out_img_fio.seek(0)
+    image_fio.seek(0)
+    plt.close()
+    return out_img_fio

@@ -35,8 +35,7 @@ from PyQt5.QtWidgets import QMessageBox
 from client.GUIImageTable import GUIImageTable
 from client.GUIShowImage import ImageDisplayer
 from client.GUIShowImage import GUIShowImage
-from PIL import Image
-import matplotlib.pyplot as plt
+import core.img_proc_core as img_proc
 
 
 class GUIMain(QMainWindow):
@@ -241,7 +240,7 @@ class GUIMain(QMainWindow):
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
-                img_hist_fio = fio_hist_fio(image_fio)
+                img_hist_fio = img_proc.fio_hist_fio(image_fio)
                 self.img_displayer.new_display(
                     img_hist_fio, name + ' Histogram')
                 del image_fio
@@ -266,7 +265,7 @@ class GUIMain(QMainWindow):
                 self.show_error(ret['error_msg'])
             else:
                 image_fio = b64s_to_fio(ret['data'])
-                img_hist_fio = fio_color_hist_fio(image_fio)
+                img_hist_fio = img_proc.fio_color_hist_fio(image_fio)
                 self.img_displayer.new_display(
                     img_hist_fio, name + ' Histogram')
         self.show_as_waiting(False)
@@ -407,6 +406,7 @@ class GUIMain(QMainWindow):
         else:
             return
 
+
     def tbl_images_cell_changed_callback(self, row: int, col: int):
         """This is the callback from editing any of the table cells
 
@@ -437,6 +437,7 @@ class GUIMain(QMainWindow):
             if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
 
+
     def show_as_waiting(self, show: bool):
 
         if show is True:
@@ -447,38 +448,4 @@ class GUIMain(QMainWindow):
         else:
             self.setEnabled(True)
             self.setWindowTitle('Image Processing Client')
-
-
-def fio_color_hist_fio(image_fio):
-
-    img_pil = Image.open(image_fio)
-    r, g, b = img_pil.split()
-
-    bins = list(range(256))
-    plt.plot(bins, r.histogram(), 'r')
-    plt.plot(bins, g.histogram(), 'g')
-    plt.plot(bins, b.histogram(), 'b')
-    plt.xlabel('Pixel value')
-    plt.ylabel('Frequency')
-    plt.grid(True)
-    out_img_fio = io.BytesIO()
-    plt.savefig(out_img_fio)
-    plt.close()
-    out_img_fio.seek(0)
-    return out_img_fio
-
-
-def fio_hist_fio(image_fio):
-    img_pil = Image.open(image_fio).convert('L')
-
-    bins = list(range(256))
-    plt.plot(bins, img_pil.histogram(), 'k')
-    plt.xlabel('Pixel value')
-    plt.ylabel('Frequency')
-    plt.grid(True)
-    out_img_fio = io.BytesIO()
-    plt.savefig(out_img_fio)
-    out_img_fio.seek(0)
-    image_fio.seek(0)
-    plt.close()
-    return out_img_fio
+            
