@@ -62,6 +62,20 @@ def upload_image(upload_img_dict: dict) -> dict:
             'error_msg': t_err,
         }
 
+    # Log Action
+    logging.info("{} - {} - CALLED: {} INPUT_ARGS: {}".format(
+        upload_img_dict['user_hash'],
+        datetime.now(),
+        'upload_image',
+        ";".join(
+            [
+                'filename: ' + upload_img_dict['filename'],
+                'description: ' + upload_img_dict['description']
+            ]
+        )
+    )
+    )
+
     # Create image file IO
     image_fio = b64s_to_fio(upload_img_dict['data'])
 
@@ -132,6 +146,19 @@ def upload_multiple_images(upload_mult_img_dict: dict) -> dict:
             'success':	False,
             'error_msg': t_err,
         }
+
+    # Log Action
+    logging.info("{} - {} - CALLED: {} INPUT_ARGS: {}".format(
+        upload_mult_img_dict['user_hash'],
+        datetime.now(),
+        'upload_multiple_images',
+        ";".join(
+            [
+                'filename: ' + upload_mult_img_dict['filename']
+            ]
+        )
+    )
+    )
 
     # Extract user hash from input data
     user_hash = upload_mult_img_dict['user_hash']
@@ -220,6 +247,15 @@ def get_image_info(user_hash: str) -> dict:
             'error_msg': t_err,
         }
 
+    # Log Action
+    logging.info("{} - {} - CALLED: {} INPUT_ARGS: {}".format(
+        user_hash,
+        datetime.now(),
+        'get_image_info',
+        ''
+    )
+    )
+
     # fetch all images for the user
     images = db.get_all_user_images(user_hash)
 
@@ -271,6 +307,20 @@ def edit_image_description(edit_image_description_dict: dict) -> dict:
             'success':	False,
             'error_msg': t_err,
         }
+
+    # Log Action
+    logging.info("{} - {} - CALLED: {} INPUT_ARGS: {}".format(
+        edit_image_description_dict['user_hash'],
+        datetime.now(),
+        'edit_image_description',
+        ";".join(
+            [
+                'image_id: ' + edit_image_description_dict['image_id'],
+                'description: ' + edit_image_description_dict['description']
+            ]
+        )
+    )
+    )
 
     # Extract image id and user hash from input data
     image_id = edit_image_description_dict['image_id']
@@ -338,6 +388,20 @@ def edit_image_filename(edit_image_filename_dict: dict) -> dict:
             'success':	False,
             'error_msg': t_err,
         }
+
+    # Log Action
+    logging.info("{} - {} - CALLED: {} INPUT_ARGS: {}".format(
+        edit_image_filename_dict['user_hash'],
+        datetime.now(),
+        'edit_image_filename',
+        ";".join(
+            [
+                'image_id: ' + edit_image_filename_dict['image_id'],
+                'filename: ' + edit_image_filename_dict['filename']
+            ]
+        )
+    )
+    )
 
     # Extract image id and user hash from input data
     image_id = edit_image_filename_dict['image_id']
@@ -407,6 +471,20 @@ def download(download_images_dict: dict) -> dict:
             'success':	False,
             'error_msg': t_err,
         }
+
+    # Log Action
+    logging.info("{} - {} - CALLED: {} INPUT_ARGS: {}".format(
+        download_images_dict['user_hash'],
+        datetime.now(),
+        'download',
+        ";".join(
+            [
+                'image_ids: ' + ','.join(download_images_dict['image_ids']),
+                'format: ' + download_images_dict['format']
+            ]
+        )
+    )
+    )
 
     # Extract image id, format and user hash from input data
     img_ids = download_images_dict['image_ids']
@@ -611,6 +689,23 @@ def image_process(image_process_dict: dict) -> dict:
             'error_msg': t_err,
         }
 
+    # Log Action
+    logging.info("{} - {} - CALLED: {} INPUT_ARGS: {}".format(
+        image_process_dict['user_hash'],
+        datetime.now(),
+        'image_process',
+        ";".join(
+            [
+                'image_id: ' + image_process_dict['image_id'],
+                'algorithm: ' + image_process_dict['algorithm'],
+                'out_image_format: ' + image_process_dict['out_image_format'],
+                'out_image_filename: ' +
+                image_process_dict['out_image_filename'],
+            ]
+        )
+    )
+    )
+
     image_id = image_process_dict['image_id']
     algorithm = image_process_dict['algorithm']
     out_image_format = image_process_dict['out_image_format']
@@ -682,13 +777,33 @@ def image_process(image_process_dict: dict) -> dict:
     }
 
 
-def get_log() -> dict:
-    """ TODO: implement this function!!
+def get_log(user_hash: str) -> dict:
+    """ return the log for current user
 
-    :return: [description]
-    :rtype: [type]
+    :param user_hash: hash identifying a user
+    :type user_hash: str
+    :return: dict with all the info. see protocol
+    :rtype: dict
     """
-    pass
+
+    if len(user_hash) != 64:
+        return {
+            'success': False,
+            'error_msg': 'Invalid Hash',
+            'log': ''
+        }
+
+    with open("server.log", 'rt') as f:
+        lns = []
+        for ln in f:
+            if user_hash in ln and 'CALLED' in ln:
+                lns.append(ln.replace('INFO:root:'+user_hash+' - ', ''))
+
+    return {
+        'success': True,
+        'error_msg': '',
+        'log': "".join(lns)
+    }
 
 
 def check_existance_and_fetch_image(image_id: str, user_hash: str) -> tuple:
