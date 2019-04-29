@@ -33,7 +33,7 @@ the code in the terminal window.
 
 Before you get access to the main window, you will be asked to type in your user name and password for verification. Images are saved for specific users. Entering a none exist user/password will not generate the previous images saved.
 
-After logging in, next window shown will be the main user interface. The table contains items: image ID, Filename, image Format, Size, Description, Timestamp when image upload and Image process time.
+After logging in, next window shown will be the main user interface. The table contains items: image ID, Filename, image Format, Size, Description and Timestamp when image upload.
 Below includes all function buttons as stated in assignment requirement.
 
 For new users, upload a new image by clicking the upload button and either 
