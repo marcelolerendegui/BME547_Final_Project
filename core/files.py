@@ -22,9 +22,9 @@
 
 from zipfile import ZipFile
 import base64
-import io
+import io as IO
 import os
-fileIO = io.IOBase
+fileIO = IO.IOBase
 
 
 def s_to_b(s: str) -> bytes:
@@ -59,7 +59,7 @@ def s_to_fio(s: str) -> fileIO:
     :return: output fileIO
     :rtype: fileIO
     """
-    fio = io.BytesIO(s.encode('utf8'))
+    fio = IO.BytesIO(s.encode('utf8'))
     fio.seek(0)
     return fio
 
@@ -96,7 +96,7 @@ def b_to_fio(b: bytes) -> fileIO:
     :return: output fileIO
     :rtype: fileIO
     """
-    fio = io.BytesIO(b)
+    fio = IO.BytesIO(b)
     fio.seek(0)
     return fio
 
@@ -133,7 +133,7 @@ def b64s_to_fio(b64s: str) -> fileIO:
     :return: output fileIO
     :rtype: fileIO
     """
-    fio = io.BytesIO(base64.b64decode(b64s.encode('utf8')))
+    fio = IO.BytesIO(base64.b64decode(b64s.encode('utf8')))
     fio.seek(0)
     return fio
 
@@ -195,7 +195,7 @@ def create_zip_fio(names_s: list, datas_b64s: list) -> fileIO:
     :rtype: fileIO
     """
     # Create empty bytesIO
-    out_fio = io.BytesIO()
+    out_fio = IO.BytesIO()
     # Open it as a zip
     with ZipFile(out_fio, 'w') as f:
         # Write each data to a file called name
