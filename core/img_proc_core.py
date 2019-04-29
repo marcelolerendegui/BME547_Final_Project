@@ -19,14 +19,15 @@
 # along with BME547_Final_Project.
 # If not, see <https://www.gnu.org/licenses/>.
 
+from core.files import *
 import numpy as np
 import io as IO
+from PIL import Image
 from skimage import data
 from skimage import img_as_float
 from skimage import util
 from skimage import exposure
 from skimage import io
-from PIL import Image
 import matplotlib.pyplot as plt
 fileIO = IO.IOBase
 
@@ -39,12 +40,15 @@ def is_image(img_fio: fileIO) -> bool:
     :return: True if input fileIO is an image, False othersise
     :rtype: bool
     """
+    bkp = fio_to_b(img_fio)
     img_fio.seek(0)
     try:
         Image.open(img_fio)
         return True
     except:
         return False
+    finally:
+        img_fio = b_to_fio(bkp)
 
 
 def get_image_size(img_fio: fileIO) -> str:
@@ -55,10 +59,11 @@ def get_image_size(img_fio: fileIO) -> str:
     :return: string formatted: 'widtxheight'
     :rtype: str
     """
+    bkp = fio_to_b(img_fio)
     img_fio.seek(0)
     img = Image.open(img_fio)
     width, height = img.size
-    img_fio.seek(0)
+    img_fio = b_to_fio(bkp)
     return str(width) + 'x' + str(height)
 
 
@@ -71,8 +76,9 @@ def get_image_format(img_fio: fileIO) -> str:
     :rtype: str
     """
     img_fio.seek(0)
+    bkp = fio_to_b(img_fio)
     img = Image.open(img_fio)
-    img_fio.seek(0)
+    img_fio = b_to_fio(bkp)
     return img.format
 
 
@@ -104,19 +110,25 @@ def transform_image(img_fio: fileIO, algorithm: str) -> fileIO:
     :return: file IO of the transformed image
     :rtype: fileIO
     """
+
+    bkp = fio_to_b(img_fio)
     img_fio.seek(0)
+
     if algorithm == 'Histogram Equalization':
-        return histogram_equalization(img_fio)
+        out_fio = histogram_equalization(img_fio)
     elif algorithm == 'Contrast Stretching':
-        return contrast_stretch(img_fio, 2, 98)
+        out_fio = contrast_stretch(img_fio, 2, 98)
     elif algorithm == 'Log Compression':
-        return log_compression(img_fio)
+        out_fio = log_compression(img_fio)
     elif algorithm == 'Contrast Invert':
-        return contrast_invert(img_fio)
+        out_fio = contrast_invert(img_fio)
     elif algorithm == 'No Algorithm':
-        return img_fio
+        out_fio = img_fio
     else:
-        return img_fio
+        out_fio = img_fio
+
+    img_fio = b_to_fio(bkp)
+    return out_fio
 
 
 def histogram_equalization(img_fio: fileIO) -> fileIO:
@@ -127,19 +139,34 @@ def histogram_equalization(img_fio: fileIO) -> fileIO:
     :return: file IO of the transformed image
     :rtype: fileIO
     """
+    bkp = fio_to_b(img_fio)
+
+    im_format = get_image_format(img_fio)
     img_fio.seek(0)
+
     img = io.imread(img_fio)
 
-    for channel in range(img.shape[2]):
-        img[:, :, channel] = exposure.equalize_hist(img[:, :, channel])*255
+    if len(img.shape) == 3:
+        for channel in range(img.shape[2]):
+            img[:, :, channel] = exposure.equalize_hist(img[:, :, channel])*255
+    elif len(img.shape) == 2:
+        img = exposure.equalize_hist(img)*255
 
     outimg = Image.fromarray(img)
 
     out_fio = IO.BytesIO()
 
-    outimg.save(out_fio, get_image_format(img_fio))
-    img_fio.seek(0)
+    # Force RGB mode for JPEG Only
+    if im_format == 'JPEG':
+        if outimg.mode != 'RGB':
+            outimg = outimg.convert('RGB')
+    else:
+        if outimg.mode != 'RGBA':
+            outimg = outimg.convert('RGBA')
+
+    outimg.save(out_fio, im_format)
     out_fio.seek(0)
+    img_fio = b_to_fio(bkp)
 
     return out_fio
 
@@ -161,6 +188,11 @@ def contrast_stretch(
     :rtype: fileIO
     """
     img_fio.seek(0)
+    bkp = fio_to_b(img_fio)
+
+    im_format = get_image_format(img_fio)
+    img_fio.seek(0)
+
     image = io.imread(img_fio)
     pl, ph = np.percentile(image, (lower_perc, higher_perc))
     img_output = exposure.rescale_intensity(image, in_range=(pl, ph))
@@ -169,10 +201,17 @@ def contrast_stretch(
 
     out_fio = IO.BytesIO()
 
-    outimg.save(out_fio, get_image_format(img_fio))
-    img_fio.seek(0)
-    out_fio.seek(0)
+    # Force RGB mode for JPEG Only
+    if im_format == 'JPEG':
+        if outimg.mode != 'RGB':
+            outimg = outimg.convert('RGB')
+    else:
+        if outimg.mode != 'RGBA':
+            outimg = outimg.convert('RGBA')
 
+    outimg.save(out_fio, im_format)
+    out_fio.seek(0)
+    img_fio = b_to_fio(bkp)
     return out_fio
 
 
@@ -185,18 +224,29 @@ def log_compression(img_fio: fileIO) -> fileIO:
     :rtype: fileIO
     """
     img_fio.seek(0)
-    image = io.imread(img_fio)
+    bkp = fio_to_b(img_fio)
 
+    im_format = get_image_format(img_fio)
+    img_fio.seek(0)
+
+    image = io.imread(img_fio)
     img_output = exposure.adjust_log(image, 1)
 
     outimg = Image.fromarray(img_output)
 
     out_fio = IO.BytesIO()
 
-    outimg.save(out_fio, get_image_format(img_fio))
-    img_fio.seek(0)
-    out_fio.seek(0)
+    # Force RGB mode for JPEG Only
+    if im_format == 'JPEG':
+        if outimg.mode != 'RGB':
+            outimg = outimg.convert('RGB')
+    else:
+        if outimg.mode != 'RGBA':
+            outimg = outimg.convert('RGBA')
 
+    outimg.save(out_fio, im_format)
+    out_fio.seek(0)
+    img_fio = b_to_fio(bkp)
     return out_fio
 
 
@@ -208,6 +258,10 @@ def contrast_invert(img_fio: fileIO) -> fileIO:
     :return: file IO of the transformed image
     :rtype: fileIO
     """
+    img_fio.seek(0)
+    bkp = fio_to_b(img_fio)
+
+    im_format = get_image_format(img_fio)
     img_fio.seek(0)
 
     # read the image
@@ -222,12 +276,19 @@ def contrast_invert(img_fio: fileIO) -> fileIO:
     # Create new file IO
     out_fio = IO.BytesIO()
 
+    # Force RGB mode for JPEG Only
+    if im_format == 'JPEG':
+        if outimg.mode != 'RGB':
+            outimg = outimg.convert('RGB')
+    else:
+        if outimg.mode != 'RGBA':
+            outimg = outimg.convert('RGBA')
+
     # save the PIL Image to the output fileIO
-    outimg.save(out_fio, get_image_format(img_fio))
+    outimg.save(out_fio, im_format)
 
-    img_fio.seek(0)
     out_fio.seek(0)
-
+    img_fio = b_to_fio(bkp)
     return out_fio
 
 
@@ -240,6 +301,7 @@ def format_convert(img_fio: fileIO, im_format: str) -> fileIO:
     :rtype: fileIO
     """
     img_fio.seek(0)
+    bkp = fio_to_b(img_fio)
 
     # Create new file IO
     out_fio = IO.BytesIO()
@@ -247,13 +309,20 @@ def format_convert(img_fio: fileIO, im_format: str) -> fileIO:
     # Open img_fio
     image = Image.open(img_fio)
 
+    # Force RGB mode for JPEG Only
+    if im_format == 'JPEG':
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+    else:
+        if image.mode != 'RGBA':
+            image = image.convert('RGBA')
+
     # Save with new format to fio
     image.save(out_fio, im_format)
 
     # Rewind and return
-    img_fio.seek(0)
     out_fio.seek(0)
-
+    img_fio = b_to_fio(bkp)
     return out_fio
 
 
@@ -265,7 +334,9 @@ def fio_color_hist_fio(image_fio):
     :return: color histogram of the input image in fileIO format
     :rtype: fileIO
     """
-    img_pil = Image.open(image_fio)
+    image_fio.seek(0)
+    bkp = fio_to_b(image_fio)
+    img_pil = Image.open(image_fio).convert('RGB')
     r, g, b = img_pil.split()
 
     bins = list(range(256))
@@ -279,6 +350,7 @@ def fio_color_hist_fio(image_fio):
     plt.savefig(out_img_fio)
     plt.close()
     out_img_fio.seek(0)
+    image_fio = b_to_fio(bkp)
     return out_img_fio
 
 
@@ -290,6 +362,8 @@ def fio_hist_fio(image_fio):
      :return: histogram of the input image in fileIO format
      :rtype: fileIO
      """
+    image_fio.seek(0)
+    bkp = fio_to_b(image_fio)
     img_pil = Image.open(image_fio).convert('L')
 
     bins = list(range(256))
@@ -300,6 +374,6 @@ def fio_hist_fio(image_fio):
     out_img_fio = IO.BytesIO()
     plt.savefig(out_img_fio)
     out_img_fio.seek(0)
-    image_fio.seek(0)
+    image_fio = b_to_fio(bkp)
     plt.close()
     return out_img_fio
