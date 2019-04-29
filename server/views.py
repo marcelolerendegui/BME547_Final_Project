@@ -64,6 +64,6 @@ def on_POST_image_process():
     return jsonify(api.image_process(request.get_json()))
 
 
-@app.route("/api/log", methods=["GET"])
-def on_GET_log():
-    return jsonify(api.get_log())
+@app.route("/api/log/<user_hash>", methods=["GET"])
+def on_GET_log(user_hash):
+    return jsonify(api.get_log(user_hash))
