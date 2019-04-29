@@ -109,7 +109,7 @@ def get_download_images(
     :rtype: dict
     """
     # Validate image_ids type
-    t_ok, t_err = is_type_ok(image_ids, "list[str]")
+    t_ok, t_err = is_type_ok(image_ids, "list[str, ...]")
     if t_ok is False:
         return {'success':	False, 'error_msg': t_err}
 
