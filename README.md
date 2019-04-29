@@ -21,7 +21,8 @@ to deploy a local server.
 ## Using the Image Processor Interface
 In order to run the software properly, fork or clone the repository and ensure you have saved the client and core folder and requirements installed.
 
-*The VM server should already be on as you are reviewing this project*
+*The VM server should already be on as you are reviewing this project.*
+
 To deploy the server remotely in a VM. We comment the local api_host and comment
 the VM: `http://vcm-8214.vm.duke.edu:5000/`.
 
