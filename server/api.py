@@ -379,7 +379,9 @@ def download(download_images_dict: dict) -> dict:
     the user calls this api function through the RESTapi.
     This function validates the input dict and calls:
     download_signle_image or download_multiple_images
+
     And returns a dicionary with success and error message
+
     :param download_images_dict: dictionary with all the
         required info (see protocol)
     :type download_images_dict: dict

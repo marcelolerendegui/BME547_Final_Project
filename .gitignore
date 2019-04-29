@@ -1,6 +1,6 @@
 .vscode/
 __pycache__/
-doc/
+doc/source/_*/
 env_vars.env
 venv/
 env/

@@ -2,7 +2,7 @@
 #       Marcelo Lerendegui <marcelo@lerendegui.com>
 #       WeiHsien Lee <weihsien.lee@duke.edu>
 #       Yihang Xin <yihang.xin@duke.edu>
-
+#
 # This file is part of BME547_Final_Project.
 #
 # BME547_Final_Project is free software: you can redistribute it and/or
@@ -211,6 +211,7 @@ def files_from_zip(zip_fio: fileIO):
 
     This function returns a generator that yields:
         filename, fileIO
+
     for each file inside the input zip in fileIO
 
     :param zip_fio: zip fileIO
