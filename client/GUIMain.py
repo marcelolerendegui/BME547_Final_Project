@@ -293,6 +293,18 @@ class GUIMain(QMainWindow):
             )
             if ret.get('success') is False:
                 self.show_error(ret['error_msg'])
+            else:
+                title = "Elapsed Time: " + name
+                message = "".join([
+                    "Time to Process ",
+                    name,
+                    " with ",
+                    algorithm,
+                    ": \n",
+                    str(ret.get('processing_time'))
+                ])
+
+                self.show_message(title, message)
         self.update_table()
         self.show_as_waiting(False)
 
@@ -331,6 +343,16 @@ class GUIMain(QMainWindow):
         :type message: str
         """
         QMessageBox.about(self, 'Error!', message)
+
+    def show_message(self, title: str, message: str):
+        """Display message in a window
+
+        :param title: title of the message window
+        :type title: str
+        :param message: message to display
+        :type message: str
+        """
+        QMessageBox.about(self, title, message)
 
     def download_images_jpg(self):
         """Callback for button DOWNLOAD JPEG
